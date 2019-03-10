@@ -135,11 +135,12 @@ function SelectSneakersByTitle(title, cb){
 	})
 }
 function SelectAllSneakers(cb){
-	var str = "SELECT * FROM Sneakers"
+	var str = "SELECT title FROM Sneakers Where category='Air Jordan One'"
 	connection.query(str, (error, results, fields)=>{
 		if(error){
 			console.log(error)
 		} else if( cb!= null ){
+			console.log("Select Success", results.length)
 			cb(results)
 		} else{
 			console.log(results)
@@ -157,20 +158,18 @@ function SelectAllSneakers(cb){
  *  @Description	- After crawl from stockx, Add to DB
  * 
 **/
-function addToPriceHistoryDB(Sid, _date, price, callback){
-	var date = _date.toFormat('YYYY-MM-DD HH24:MI:SS')
-	var time = _date.getTime()/1000
+function addToPriceHistoryDB(Sid, _date, price, callback){ 
 	var str = "INSERT INTO PriceHistory VALUES('"
 			+ Sid	+ "','"
-			+ date	+ "','"
-			+ time	+ "','"
-			+ price + "');"
-	//console.log(str)
+			+ _date.toFormat('YYYY-MM-DD HH24:MI:SS')	+ "',"
+			+ _date.getTime()/1000	+ ","
+			+ price + ");"
+	console.log(str)
 	connection.query(str, function (error, results, fields) {
 		if (error){
-			console.log(error)
+			console.log("[fail] ",Sid, _date, price)
 		} else{
-			console.log("[success] ",Sid, date, time, price)
+			console.log("[success] ",Sid, _date, price)
 		}
 	})
 	if(callback != null)
@@ -336,14 +335,12 @@ function browsePriceHistory(title, startDate, endDate, interval=100){
 			})
 			res.on('end', ()=>{
 				var dat = JSON.parse(merged)
-				if(dat.series[0].data[0] == null)
-					console.log(results[0].ID, title, "null")
-				else{
-					dat.series[0].data.forEach( (e)=>{
-						var currentTime = new Date(e[0])
-						addToPriceHistoryDB(results[0].ID, currentTime, e[1])
-					})
-				}
+
+				dat.series[0].data.forEach( (e)=>{
+					var currentTime = new Date(e[0])
+					addToPriceHistoryDB(results[0].ID, currentTime, e[1])
+				})
+				
 			})
 		})
 
@@ -369,8 +366,8 @@ brands.forEach( (e)=>{
 //browsePriceHistory('Jordan 1 Retro High Pine Green',null,null)
 
 SelectAllSneakers((results)=>{
+	console.log("Select Fin", results.length)
 	results.forEach((e)=>{
-		console.log(e.title)
 		browsePriceHistory(e.title,null,null)
 	})
 })
