@@ -1,5 +1,6 @@
 var mysql = require('mysql')
 var https = require('https')
+//var fs = require('fs');
 require('date-utils')
 
 
@@ -134,7 +135,7 @@ function SelectSneakersByTitle(title, cb){
 	})
 }
 function SelectAllSneakers(cb){
-	var str = "SELECT * FROM Sneakers WHERE category='Saucony'"
+	var str = "SELECT * FROM Sneakers"
 	connection.query(str, (error, results, fields)=>{
 		if(error){
 			console.log(error)
@@ -164,7 +165,7 @@ function addToPriceHistoryDB(Sid, _date, price, callback){
 			+ date	+ "','"
 			+ time	+ "','"
 			+ price + "');"
-	console.log(str)
+	//console.log(str)
 	connection.query(str, function (error, results, fields) {
 		if (error){
 			console.log(error)
@@ -336,11 +337,11 @@ function browsePriceHistory(title, startDate, endDate, interval=100){
 			res.on('end', ()=>{
 				var dat = JSON.parse(merged)
 				if(dat.series[0].data[0] == null)
-					console.log(results[0].ID, title,"null")
+					console.log(results[0].ID, title, "null")
 				else{
 					dat.series[0].data.forEach( (e)=>{
 						var currentTime = new Date(e[0])
-						//addToPriceHistoryDB(results[0].ID, currentTime, e[1])
+						addToPriceHistoryDB(results[0].ID, currentTime, e[1])
 					})
 				}
 			})
