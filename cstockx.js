@@ -336,6 +336,7 @@ function browsePriceHistory(title, startDate, endDate, interval=100){
 			res.on('end', ()=>{
 				var dat = JSON.parse(merged)
 				dat.series[0].data.forEach( (e)=>{
+					if(e[1]==null) return;
 					var currentTime = new Date(e[0])
 					addToPriceHistoryDB(results[0].ID, currentTime, e[1])
 				})
