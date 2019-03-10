@@ -1,6 +1,6 @@
 var mysql = require('mysql')
 var https = require('https')
-
+require('date-utils')
 
 
 // 비밀번호는 별도의 파일로 분리해서 버전관리에 포함시키지 않아야 합니다. 
@@ -57,8 +57,32 @@ var brands = [
 			models: ['under%20armour']}
 ]
 
-function addToDB(product, callback){
 
+/*
+ *  @function	addToSneakersDB
+ *  @params	{Object}	product	- product object from Stockx.com
+ *    @attribute	{String}	brand	-> Sneakers.brand
+ *    @attribute	{String}	category	-> Sneakers.category
+ *    @attribute	{String}	colorway	-> Sneakers.colorway
+ *    @attribute	{String}	name	-> Sneakers.name
+ *    @attribute	{String}	releaseDate	-> Sneakers.releaseDate
+ *    @attribute	{Integer}	releaseTime	-> Sneakers.releaseTime
+ *    @attribute	{Integer}	retailPrice	-> Sneakers.retailPrice
+ *    @attribute	{String}	shoe	-> Sneakers.shoe
+ *    @attribute	{String}	shortDescription	-> Sneakers.shortDescription
+ *    @attribute	{String}	title	-> Sneakers.title
+ *    @attribute	{String}	urlKey	-> Sneakers.urlKey
+ *    @attribute	{Object}	media	-> Sneakers.imageUrl
+ *    @attribute	{String}	id	-> Sneakers.ID
+ *  @params {function}	callback	- callback function
+ * 
+ *  @Description	- After crawl from stockx, Add to DB
+ *
+ *  @TODO	- add options for other case
+ * 			  If we need more data, I will add more attributes
+ * 
+**/
+function addToSneakersDB(product, callback){
 	product.name=product.name.replace(/\'/gi,"")
 	product.shoe=product.shoe.replace(/\'/gi,"")
 	product.shortDescription=product.shortDescription.replace(/\'/gi,"")
@@ -93,7 +117,66 @@ function addToDB(product, callback){
 		callback()
 }
 /*
- *  @function	getCall
+ *  @function	SelectSneakersByTitle
+ *  @params	{String}	title	- Sneakers.title in DB
+ *  @params {function}	cb	- callback function
+**/
+function SelectSneakersByTitle(title, cb){
+	var str = "SELECT * FROM Sneakers WHERE title='"+ title + "'"
+	connection.query(str, function (error, results, fields) {
+		if (error){
+			console.log(error)
+		} else if(cb != null){
+			cb(results)
+		} else{
+			console.log(results)
+		}
+	})
+}
+function SelectAllSneakers(cb){
+	var str = "SELECT * FROM Sneakers WHERE category='Saucony'"
+	connection.query(str, (error, results, fields)=>{
+		if(error){
+			console.log(error)
+		} else if( cb!= null ){
+			cb(results)
+		} else{
+			console.log(results)
+		}
+	})
+}
+
+/*
+ *  @function	addToPriceHistoryDB
+ *  @params	{String}	Sid		- Sneakers' ID
+ *  @params	{Object}	_date	- Date Object
+ *  @params	{Integer}	Price	- Sneakers' price
+ *  @params {function}	callback	- callback function
+ * 
+ *  @Description	- After crawl from stockx, Add to DB
+ * 
+**/
+function addToPriceHistoryDB(Sid, _date, price, callback){
+	var date = _date.toFormat('YYYY-MM-DD HH24:MI:SS')
+	var time = _date.getTime()/1000
+	var str = "INSERT INTO PriceHistory VALUES('"
+			+ Sid	+ "','"
+			+ date	+ "','"
+			+ time	+ "','"
+			+ price + "');"
+	console.log(str)
+	connection.query(str, function (error, results, fields) {
+		if (error){
+			console.log(error)
+		} else{
+			console.log("[success] ",Sid, date, time, price)
+		}
+	})
+	if(callback != null)
+		callback()
+}
+/*
+ *  @function	browseModels
  *
  *  @param	{Object}	brand	- 
  *		{String}	model	-
@@ -104,7 +187,7 @@ function addToDB(product, callback){
  *  @description	- Browse sneakers using parameters
  *
 **/
-function getCall( brand, model, year, page ) {
+function browseModels( brand, model, year, page ) {
 	var merged = ''
 	if( !brand || !brand.name ){
 		console.log( "brand name is empty" )
@@ -118,6 +201,7 @@ function getCall( brand, model, year, page ) {
 		path: '/api/browse?productCategory=sneakers&sort=release_date&order=DESC',
 		method: 'GET'
 	}
+
 	//
 	// Add Page informagion to URL
 	//
@@ -170,11 +254,11 @@ function getCall( brand, model, year, page ) {
 			if(dat.Pagination.total > 1000){
 				if( model == null ){
 					brand.models.forEach( (e)=>{
-						getCall( brand, e, null, null )
+						browseModels( brand, e, null, null )
 					})
 				} else if( year == null ){
 					for( var i=2001; i<=2019; i++)
-						getCall( brand, model, i, null )
+						browseModels( brand, model, i, null )
 				} else{
 					console.log("Warning!: ["+brand.name+" "+model+" "+year+"] is too many!")
 				}
@@ -190,17 +274,17 @@ function getCall( brand, model, year, page ) {
 				//console.log(dat.Pagination.page)
 				for(var i=0; i<dat.Products.length; i++){
 					//console.log(dat.Products[i].title)
-					addToDB(dat.Products[i],null)
+					addToSneakersDB(dat.Products[i],null)
 				}
 	
-				getCall( brand, model, year, Number(dat.Pagination.page)+1 )
+				browseModels( brand, model, year, Number(dat.Pagination.page)+1 )
 			} else{
 				/*
 				 *  [ INSERT DB ]
 				 */
 				for(var i=0; i<dat.Products.length; i++){
 					//console.log(dat.Products[i].title)
-					addToDB(dat.Products[i],null)
+					addToSneakersDB(dat.Products[i],null)
 				}
 				console.log("["+brand.name+" "+model+" "+year+"]\tDone!\t"+dat.Pagination.total+" items")
 				
@@ -214,40 +298,54 @@ function getCall( brand, model, year, page ) {
 	})
 }
 
-function apiTest( brand, model ) {
-	var merged = ''
-	if( !brand || !brand.name ){
-		console.log( "brand name is empty" )
-		return
+/*
+ *  @function	browsePriceHistory
+ *
+ *  @params	{String}	title	- Sneakers' title 
+ *  @params	{String}	startDate - 'YYYY-MM-DD' format
+ *  @params	{String}	endDate - 'YYYY-MM-DD' format
+ *
+ *  @return	X
+ *  @description	- Browse sneakers using parameters
+ * 
+**/
+function browsePriceHistory(title, startDate, endDate, interval=100){
+	var now = new Date()
+	if(!endDate)
+		endDate = now.toFormat('YYYY-MM-DD')
+	if(!startDate){
+		now.add({months:-3})
+		startDate = now.toFormat('YYYY-MM-DD')
 	}
-	var options = {
-		host: 'stockx.com',
-		port: 443,
-		path: '/api/browse?productCategory=sneakers&sort=release_date&order=DESC',
-		method: 'GET'
-	}
-
-	if( model )
-		options.path += '&_tags='+model+','+brand.name
-	else
-		options.path += '&_tags='+brand.name
-	
-	var getReq = https.request(options, (res)=>{
-		res.on('data', (data)=>{ merged += data })
-		res.on('end', ()=>{
-			var dat = JSON.parse(merged)
-				if( model == null ){
-					brand.models.forEach( (e)=>{
-						apiTest( brand, e, null, null )
-					})
-				} else{
-					console.log("["+brand.name+"] "+model+":\t"+dat.Pagination.total)
-				}
+	SelectSneakersByTitle(title, (results)=>{
+		var merged = ''
+		var options = {
+			headers: {"Referer":"https://stockx.com/" + results[0].urlKey},
+			host: 'stockx.com',
+			port: 443,
+			path:'https://stockx.com/api/products/' + results[0].ID + '/chart?' +
+					'start_date='	+ startDate +
+					'&end_date='	+ endDate +
+					'&intervals='	+ interval +	'&format=highstock&currency=USD',
+			method:'GET'
+		}
+		var getReq = https.request(options, (res)=>{
+			res.on('data', (data)=>{
+				merged += data
+			})
+			res.on('end', ()=>{
+				var dat = JSON.parse(merged)
+				dat.series[0].data.forEach( (e)=>{
+					var currentTime = new Date(e[0])
+					addToPriceHistoryDB(results[0].ID, currentTime, e[1])
+				})
+			})
 		})
-	})
-	getReq.end()
-	getReq.on('error', (err)=>{
-		console.log("Error: ", err)
+
+		getReq.end()
+		getReq.on('error', (err)=>{
+			console.log("Error: ", err)
+		})
 	})
 }
 
@@ -255,9 +353,19 @@ function apiTest( brand, model ) {
 //
 // Call the function for test..
 //
-//getCall( brands[0] )
+//browseModels( brands[0] )
 
-
+/*
 brands.forEach( (e)=>{
-	getCall(e)
+	browseModels(e)
+})
+*/
+
+//browsePriceHistory('Jordan 1 Retro High Pine Green',null,null)
+
+SelectAllSneakers((results)=>{
+	results.forEach((e)=>{
+		console.log(e.title)
+		browsePriceHistory(e.title,null,null)
+	})
 })
