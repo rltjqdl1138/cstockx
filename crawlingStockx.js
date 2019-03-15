@@ -1,3 +1,5 @@
+
+const mapper = require('./map.js')
 const dbObject = require('./dbConnection.js')
 const https = require('https')
 const fs = require('fs');
@@ -103,10 +105,10 @@ function browseModels( connection, brand, model, year, page ) {
 	 *	2. Find ignored items
 	 *
 	**/
-	var getReq = https.request(options, (res)=>{
+	let getReq = https.request(options, (res)=>{
 		res.on('data', (data)=>{ merged += data })
 		res.on('end', ()=>{
-			var dat = JSON.parse(merged)
+			let dat = JSON.parse(merged)
 
 			//
 			// Detail API Call
@@ -125,28 +127,24 @@ function browseModels( connection, brand, model, year, page ) {
 			}else if(dat.Pagination.lastPage == 0){
 				//console.log("["+brand.name+" "+model+" "+year+"]\tEmpty!!")
 			}else if( dat.Pagination.nextPage != null ){
-				//console.log("["+brand.name+" "+model+" "+year+"]\t"+dat.Pagination.page+"/"+dat.Pagination.lastPage+"\t"+dat.Products.length+"items")
 				/*
 				 *  [ INSERT DB ]
 				 *  variable "dat.Products" is Array
 				 *  there is too many informations to write here
 				 */
-				//console.log(dat.Pagination.page)
-				for(var i=0; i<dat.Products.length; i++){
-					//console.log(dat.Products[i].title)
-					addToSneakersDB(dat.Products[i],null)
-				}
+				dat.Products.forEach((e)=>{
+					connection.Sneakers.insert(connection.getDB(),e,null)
+				})
 	
-				browseModels( brand, model, year, Number(dat.Pagination.page)+1 )
+				setTimeout( ()=>{browseModels( connection, brand, model, year, Number(dat.Pagination.page)+1 )},0)
 			} else{
 				/*
 				 *  [ INSERT DB ]
 				 */
-				for(var i=0; i<dat.Products.length; i++){
-					//console.log(dat.Products[i].title)
-					addToSneakersDB(dat.Products[i],null)
-				}
-				console.log("["+brand.name+" "+model+" "+year+"]\tDone!\t"+dat.Pagination.total+" items")
+				dat.Products.forEach((e)=>{
+					connection.Sneakers.insert(connection.getDB(),e,null)
+				})
+				setTimeout(()=>{console.log("["+brand.name+" "+model+" "+year+"]\tDone!\t"+dat.Pagination.total+" items")},0)
 				
 			}
 		})
@@ -212,60 +210,41 @@ function browsePriceHistory(connection, title, startDate, endDate, interval=100)
 }
 
 //browsePriceHistory('Jordan 1 Retro High Pine Green',null,null)
+
 var dbCon = new dbObject()
+console.log('\n\n\n\n\n\n\n\n\n\n\n\n')
 setTimeout(()=>{
-	dbCon.Sneakers.select_shoe(dbCon.getDB(), null, null,(results)=>{
-		distribute(results)
+	brands.forEach( (e)=>{
+		browseModels(dbCon,e,null,null,null)
 	})
+	//dbCon.Sneakers.select_shoe(dbCon.getDB(), null, null,(results)=>{
+		//distribute(results)
+	//})
 },0)
-function distribute(input){
-	var array = [0, 0, 0, 0, 0, 0, 0, 0]
-
-	for(var i=0; i<input.length; i++){
-		if (input[i].shoe.indexOf("Jordan")!=-1){
-			var str = input[i].shoe
-			array[0]+=1
-			str = str.replace("Air Jordan", "조던")
-			str = str.replace("Jordan", "조던")
-			str = str.replace("Retro", "레트로")
-			str = str.replace("Spizike","스피자이크")
-			str = str.replace("Flight","플라이트")
-
-			str = str.replace("XXXIII", "33")
-			str = str.replace("XXXII", "32")
-			str = str.replace("XXXI", "31")
-
-			str = str.replace("XXX3", "33")
-			str = str.replace("XXX2", "32")
-			str = str.replace("XXX1", "31")
-			
-			str = str.replace("XXX", "30")
-			str = str.replace("XX9", "29")
-			str = str.replace("XX8", "28")
-			str = str.replace("XX", "20")
-
-			str = str.replace("Xiii", "13")
-			str = str.replace("Xii", "12")
-			str = str.replace("XI", "11")
-			str = str.replace("Xi", "11")
 
 
-			str = str.replace("VIII", "8")
-			str = str.replace("VII", "7")
-			str = str.replace("VI", "6")
-			str = str.replace("IV 4", "4")
-			
-			str = str.replace("V.", "5.")
-			str = str.replace(" V", " 5")
-			str = str.replace("I 1", "1")
-			str = str.replace("III", "3")
-			str = str.replace("II", "2")
-			console.log(`${array[0]}. ${input[i].shoe} \t=> ${str}`)
-			
+function distribute(input, callback){
+	var str = ""
+	input.forEach((e)=>{
+		if (e.shoe.indexOf("Jordan")!=-1){
+			str += e.shoe + "\r\n"
+			str += mapper.MappingAll(mapper.MappingJordan(e.shoe))+ "\r\n\r\n"
+        	//console.log(`[Jordan]\t${e.shoe} \t=> ${str}`)
+		} else if(e.shoe.indexOf("Nike")!=-1){
+			str += e.shoe + "\r\n"
+			str += mapper.MappingAll(mapper.MappingNike(e.shoe))+ "\r\n\r\n"
+			//console.log(`[Nike]\t${e.shoe} \t=> ${str}`)
+		} else if(e.shoe.indexOf("adidas")!=-1){
+			str += e.shoe + "\r\n"
+			str += mapper.MappingAll(mapper.MappingAdidas(e.shoe))+ "\r\n\r\n"
+			//console.log(`[Adidas]\t${e.shoe} \t=> ${str}`)
 		}
-	}
+	})
 	setTimeout(()=>{
-		console.log("result::",array[0])
+		console.log("All Done")
+		fs.writeFile("out.txt", str, "utf8", function(error) {
+			console.log(str);
+		});
 	},0)
 }
 

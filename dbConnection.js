@@ -29,7 +29,7 @@ module.exports = class Connection{
 }
 
 /*
- *  @function	addToSneakersDB
+ *  @function	InsertToSneakersDB
  *  @params	{Object}	product	- product object from Stockx.com
  *    @attribute	{String}	brand	-> Sneakers.brand
  *    @attribute	{String}	category	-> Sneakers.category
@@ -126,7 +126,7 @@ function SelectSneakersShoe(connection, keyword, input, cb){
 
 
 /*
- *  @function	addToPriceHistoryDB
+ *  @function	InsertToPriceHistoryDB
  *  @params	{String}	Sid		- Sneakers' ID
  *  @params	{Object}	_date	- Date Object
  *  @params	{Integer}	Price	- Sneakers' price
