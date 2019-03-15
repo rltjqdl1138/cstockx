@@ -116,11 +116,11 @@ function browseModels( connection, brand, model, year, page ) {
 			if(dat.Pagination.total > 1000){
 				if( model == null ){
 					brand.models.forEach( (e)=>{
-						browseModels( brand, e, null, null )
+						browseModels( connection, brand, e, null, null )
 					})
 				} else if( year == null ){
 					for( var i=2001; i<=2019; i++)
-						browseModels( brand, model, i, null )
+						browseModels( connection, brand, model, i, null )
 				} else{
 					console.log("Warning!: ["+brand.name+" "+model+" "+year+"] is too many!")
 				}
