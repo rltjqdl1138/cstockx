@@ -117,6 +117,7 @@ function addToSneakersDB(product, callback){
 	if(callback != null)
 		callback()
 }
+
 /*
  *  @function	SelectSneakersByTitle
  *  @params	{String}	title	- Sneakers.title in DB

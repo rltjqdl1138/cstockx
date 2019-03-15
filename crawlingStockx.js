@@ -214,12 +214,14 @@ function browsePriceHistory(connection, title, startDate, endDate, interval=100)
 var dbCon = new dbObject()
 console.log('\n\n\n\n\n\n\n\n\n\n\n\n')
 setTimeout(()=>{
+	/*
 	brands.forEach( (e)=>{
 		browseModels(dbCon,e,null,null,null)
 	})
-	//dbCon.Sneakers.select_shoe(dbCon.getDB(), null, null,(results)=>{
-		//distribute(results)
-	//})
+	*/
+	dbCon.Sneakers.select_shoe(dbCon.getDB(), null, null,(results)=>{
+		distribute(results)
+	})
 },0)
 
 
