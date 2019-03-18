@@ -22,6 +22,9 @@ module.exports = class Connection{
         this.PriceHistory = {
             insert: InsertToPriceHistoryDB
         }
+        this.TradeTransaction = {
+            insert: InsertToTradeTransactionDB
+        }
     }
     getDB(){
         return this.db
@@ -150,4 +153,35 @@ function InsertToPriceHistoryDB(connection, Sid, _date, price, cb){
             console.log("[success] ",Sid, _date, price)
         }
 	})
+}
+
+/*
+ *  @function	InsertToTradeTransactionDB
+ *  @params	{Object}	input	- crawled data object
+ *    
+ * 
+ *  @Description	- After crawl from stockx, Add to DB
+**/
+function InsertToTradeTransactionDB(connection, Pid, input, cb){
+	var str = "INSERT INTO TradeTransaction VALUES('"
+			+ input.chainId + "','"
+            + Pid	+ "','"
+            + input.skuUuid	+ "',"
+            + input.amount	+ ","
+            + input.shoeSize	+ ",'"
+            + input.createdAt+"');"
+
+    console.log(str)
+    
+	connection.query(str, function (error, results, fields) {
+		if (error){
+			console.log("[fail] ",Pid, input.createdAt)
+		} else if(cb!=null){
+            console.log("[success] ",Pid, input.createdAt)
+            cb()
+		} else{
+            console.log("[success] ",Pid,  input.createdAt)
+        }
+    })
+    
 }

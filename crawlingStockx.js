@@ -209,6 +209,68 @@ function browsePriceHistory(connection, title, startDate, endDate, interval=100)
 	})
 }
 
+
+
+/*
+ *  @function	browseModels
+ *
+ *  @param	{Object}	brand	- 
+ *		{String}	model	-
+ *		{Integer}	year	-
+ *		{Integer}	page	-
+ *
+ *  @return	X
+ *  @description	- Browse sneakers using parameters
+ *
+**/
+function browseTradeTransaction( connection, ID, page ) {
+	var merged = ''
+	if( !page ){
+		page = 1
+	}
+	var options = {
+		host: 'stockx.com',
+		port: 443,
+		path: "/api/products/"+ID+"/activity?state=480&currency=USD&limit=1000&page="+page+"&sort=createdAt&order=DESC",
+		method: 'GET'
+	}
+	let getReq = https.request(options, (res)=>{
+		res.on('data', (data)=>{ merged += data })
+		res.on('end', ()=>{
+			let dat = JSON.parse(merged)
+			//console.log(dat)
+			console.log(`${ID}:\t${1000*dat.Pagination.page}/${dat.Pagination.total}`)
+
+			if( dat.Pagination.nextPage != null ){
+
+				dat.ProductActivity.forEach((e)=>{
+					//var _day = e.createdAt.split('T')
+					//var _time = _day[1].split('+')
+					//e.createdTime = new Date(_day[0]+" "+_time[0])
+					connection.TradeTransaction.insert(connection.getDB(), ID, e)
+				})
+
+				setTimeout( ()=>{browseTradeTransaction( connection, ID, Number(dat.Pagination.page)+1 )},0)
+			} else{
+				/*
+				 *  [ INSERT DB ]
+				 */
+				dat.ProductActivity.forEach((e)=>{
+					//var _day = e.createdAt.split('T')
+					//var _time = _day[1].split('+')
+					//e.createdTime = new Date(_day[0]+" "+_time[0])
+					connection.TradeTransaction.insert(connection.getDB(), ID, e)
+				})
+			}
+		})
+	})
+	getReq.end()
+	getReq.on('error', (err)=>{
+		console.log("Error: ", err)
+		connection.end();
+	})
+}
+
 //browsePriceHistory('Jordan 1 Retro High Pine Green',null,null)
 
 var dbCon = new dbObject()
@@ -219,8 +281,16 @@ setTimeout(()=>{
 		browseModels(dbCon,e,null,null,null)
 	})
 	*/
+	/*
 	dbCon.Sneakers.select_shoe(dbCon.getDB(), null, null,(results)=>{
 		distribute(results)
+	})
+	*/
+	dbCon.Sneakers.select(dbCon.getDB(), 'brand', 'Air Jordan' , (results)=>{
+		console.log(`Select: ${results.length} was found`)
+		results.forEach((e)=>{
+			browseTradeTransaction(dbCon, e.ID, 1)
+		})
 	})
 },0)
 
