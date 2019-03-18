@@ -1,10 +1,8 @@
 const dbObject = require('./dbConnection.js')
 class Mapper{
     constructor(){
-        let v1 = new MappingNode('Jordan',0)
-        let v2 = new MappingNode('조던',0)
-        this.EnglishWords = [v1]
-        this.KoreanWords = [v2]
+        this.EnglishWords = []
+        this.KoreanWords = []
     }
     insert(Eng, Kor){
         let indxE = this._search(this.EnglishWords,Eng)
@@ -41,15 +39,24 @@ class Mapper{
             arr = this.KoreanWords
         return arr.findIndex((item)=>{return item.word === wor})
     }
-    convert(lan, word){
+    convert(lan, word, word2){
+        let length = 2
         let a;
         let b;
         if(lan == 'Eng'){
-            a = this._search(this.EnglishWords, word)
-            if( a == -1 ){ 
+            if( word2 == null )
+                a = this._search(this.EnglishWords, word)
+            else
+                a = this._search(this.EnglishWords, word + " " + word2)
+            if( a == -1 ){
+                length = 1;
+                if(word2 == null)
+                    return {word: word, length: length};
+                a = this._search(this.EnglishWords, word) 
+                if(a == -1)
+                    return {word: word, length: length}
                 //console.log(word,': nope')
                 //return ">"+word+"<"
-                return word;
             }
             //console.log(a,`\t`,this.EnglishWords[a].link)
             for(var j=0; j<this.EnglishWords[a].link.length; j++){
@@ -58,14 +65,21 @@ class Mapper{
                    b = this.KoreanWords[e]
                 else if(this.KoreanWords[e].link.length > b.link.length)
                     b = this.KoreanWords[e]
-
             }
         } else if(lan == 'Kor'){
-            a = this._search(this.KoreanWords, word)
-            if( a == -1 ){ 
+            if( word2 == null )
+                a = this._search(this.KoreanWords, word)
+            else
+                a = this._search(this.KoreanWords, word + " " + word2)
+            if( a == -1 ){
+                length = 1;
+                if(word2 == null)
+                    return {word: word, length: length};
+                a = this._search(this.KoreanWords, word) 
+                if(a == -1)
+                    return {word: word, length: length}
                 //console.log(word,': nope')
                 //return ">"+word+"<"
-                return word;
             }
             //console.log(a,`\t`,this.EnglishWords[a].link)
             for(var j=0; j<this.KoreanWords[a].link.length; j++){
@@ -78,7 +92,7 @@ class Mapper{
             }
         }
         //console.log(word,":",b.word)
-        return b.word
+        return {word:b.word, length:length}
     }
     
 }
@@ -102,15 +116,10 @@ setTimeout(()=>{
 		browseModels(dbCon,e,null,null,null)
 	})
     */
-    a._search(null,'Jordan')
-    a.insert('Jorrdan', "조던")
-    a._search(a.KoreanWords,'조던')
-    a._search(null,'Jorrdan')
     MappingJordan(a)
     MappingAdidas(a)
     MappingNike(a)
     MappingAll(a)
-    distribute(a, [{shoe:"에어 조던 1 레트로 97"}], "Kor")
     
 	dbCon.Sneakers.select_shoe(dbCon.getDB(), null, null,(results)=>{
         distribute(a, results, "Eng")
@@ -122,10 +131,18 @@ setTimeout(()=>{
 function distribute(mapper, results, lan="Eng", rot=1){
     let unlan = lan=="Eng" ? "Kor" : "Eng";
     results.forEach((e)=>{
+        let i=0
         var arr = e.shoe.split(' ')
         let str = ""
-        for(var i=0; i<arr.length; i++){
-            str+=mapper.convert(lan,arr[i])+" "
+        for(i=0; i<arr.length-1; i++){
+            let result=mapper.convert(lan, arr[i], arr[i+1])
+            if(result.length == 2) i++
+            //console.log(`arr[i]: ${arr[i]}\n arr[i+1]: ${arr[i+1]}\nresult: ${result.word}`)
+            str += result.word + " "
+        }
+        if( i<arr.length ){
+            let result = mapper.convert(lan, arr[i], null)
+            str += result.word
         }
         console.log(e.shoe)
         console.log("=>",str)
@@ -186,9 +203,9 @@ function MappingAll( a ){
     a.insert("Retro", "레트로")
 }
 function MappingJordan ( a ){
-        a.insert("Jordan Jordan", "조던")
+        a.insert("Jordan", "조던")
         a.insert("Air Jordan", "조던")
-		a.insert("Jordan", "조던")
+        a.insert("Jordan Air", "조던")
 		a.insert("Spizike","스피자이크")
 		a.insert("Flightclub","플라이트클럽")
 		a.insert("Flight","플라이트")
@@ -203,8 +220,11 @@ function MappingJordan ( a ){
 		a.insert("Pure", "퓨어")
 
 		a.insert("Flyknit", "플라이니트")
-		a.insert("Super.Fly", "슈퍼플라이")
+		a.insert("Super.fly", "슈퍼 플라이")
+		a.insert("Super fly", "슈퍼 플라이")
+		a.insert("SuperFly", "슈퍼플라이")
 		a.insert("Super Fly", "슈퍼플라이")
+		a.insert("Super.Fly", "슈퍼플라이")
 		a.insert("Super", "슈퍼")
 		a.insert("Prime.Fly", "프라임 플라이")
 		a.insert("Prime", "프라임")
