@@ -1,0 +1,16 @@
+type Product {
+  id: ID! @unique
+  uuid: String!
+  brand: String!
+  category: String!
+  shoe: String!
+  name: String!
+  title: String!
+  urlKey: String!
+  imgURL: String
+  releaseDate: DateTime
+  retailPrice: Int
+  rawData: Json!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}

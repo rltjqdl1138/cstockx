@@ -1,0 +1,21 @@
+{
+  "name": "cstockx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "KKS",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "module": "^1.2.5",
+    "modules": "^0.4.0",
+    "prisma-client-lib": "^1.29.2"
+  },
+  "devDependencies": {
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.4000"
+  }
+}
