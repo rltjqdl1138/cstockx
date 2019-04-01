@@ -1,6 +1,5 @@
 import axios from "axios";
-import { prisma } from "./generated/prisma-client";
-
+import { prisma } from "../generated/prisma-client";
 
 const headers = { headers: { 'User-Agent': "Mozilla/5.0" }}
 const ModelBaseURL =
@@ -35,7 +34,8 @@ const brands = [
 	{	name: 'saucony',
 		models: ['saucony']},
 	{	name: 'under%20armour',
-		models: ['under%20armour']} ]
+    models: ['under%20armour']} ]
+    
 
 /*
  * @ Class StockX
@@ -50,7 +50,9 @@ const brands = [
 **/
 class StockX {
   run = async () =>{
-    this.collectAll()
+    console.log('run')
+    const a = await this.collectAll()
+    await console.log(a)
   }
 
   createUrl = async (baseURL: string, querys: Object):Promise<string> => {
@@ -60,40 +62,25 @@ class StockX {
     return baseURL;
   }
 
-  collectAll = async ():Promise<void> => {
-    const tags:Array<string> = [];
+  collectAll = async ():Promise<Array<string> > => {
+    const _tags:Array<string> = [];
+    const urls:Array<string> = [];
     await brands.map((e:{name:string, models:Array<string>})=>{
       e.models.map((v:string)=>{
         if(e.name == v)
-          tags.push(e.name)
+          _tags.push(e.name)
         else
-          tags.push(e.name+','+v)
+          _tags.push(e.name+','+v)
       })
     })
-    await tags.map( async (e:string)=>{
-      const _url = await this.createUrl(ModelBaseURL, {_tags:e})
-      const urls = await this.seperateUrlByYears(_url)
-      await urls.map((e:string)=>{ this.collectProductsInPage(e) })
-    })
-  };
-
-  seperateUrlByYears = async (baseUrl:string): Promise<any> => {
-    const urls: Array<string> = [];
-    const newUrl:string = await this.createUrl(baseUrl, {_tags: 'nike'})
-    const response: any =
-      await axios.get(baseUrl,headers)
-      .catch(error=>console.log('\n\n[ERROR] Function SeperateByYears\n',baseUrl,'\n'))
-    
-    // StockX doesn't show data over 1000 at once
-    // So Seperate by release years
-    if(response.data.Pagination.total>=1000)
-      await years.map((e)=>{
-        this.createUrl(baseUrl,{year: e})
-          .then(result=>urls.push(result))
+    await _tags.map( async (e:string)=> {
+      years.map( async (year:string) => {
+        const url = await this.createUrl(ModelBaseURL, {_tags:e, year})
+        //console.log(url)
+        urls.push( url )
       })
-    else
-      await urls.push(baseUrl)
-    return urls
+    })
+    return urls;
   };
 
   collectProductsInPage = async (baseUrl: string): Promise<any> => {
@@ -123,8 +110,9 @@ class StockX {
   };
 
   insertProduct = async (product: any) => {
-    let { shoe, uuid, brand, category, name, urlKey, releaseDate, retailPrice, title } = product;
-    const imgURL = product.media.imageUrl
+    const { shoe, uuid, brand, category, name, urlKey, retailPrice, title } = product;
+    const imgURL = product.imgURL ? product.media.imageUrl : ''
+    const releaseDate = product.releaseDate ? product.releaseDate.split(' ')[0] : null
 
     try{
       const a = await prisma.products( {where:{uuid} })
@@ -132,7 +120,6 @@ class StockX {
         //console.log(`[Pass] ${title} is already registered`)
         return
       };
-      releaseDate = releaseDate ? releaseDate.split(' ')[0] : null
       const newProduct = await prisma.createProduct({
         uuid,
         brand,
@@ -150,7 +137,8 @@ class StockX {
         `Created new product: ${newProduct.title} (ID: ${newProduct.id})`
       )
     } catch(e){
-      console.log(e)
+      //console.log(e)
+      console.log(`[ERROR] Not Created ${title}`)
     }
   };
 }

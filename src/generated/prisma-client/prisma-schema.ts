@@ -6,6 +6,10 @@ export const typeDefs = /* GraphQL */ `type AggregateProduct {
   count: Int!
 }
 
+type AggregateURL {
+  count: Int!
+}
+
 type BatchPayload {
   count: Long!
 }
@@ -23,6 +27,12 @@ type Mutation {
   upsertProduct(where: ProductWhereUniqueInput!, create: ProductCreateInput!, update: ProductUpdateInput!): Product!
   deleteProduct(where: ProductWhereUniqueInput!): Product
   deleteManyProducts(where: ProductWhereInput): BatchPayload!
+  createURL(data: URLCreateInput!): URL!
+  updateURL(data: URLUpdateInput!, where: URLWhereUniqueInput!): URL
+  updateManyURLs(data: URLUpdateManyMutationInput!, where: URLWhereInput): BatchPayload!
+  upsertURL(where: URLWhereUniqueInput!, create: URLCreateInput!, update: URLUpdateInput!): URL!
+  deleteURL(where: URLWhereUniqueInput!): URL
+  deleteManyURLs(where: URLWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -350,10 +360,169 @@ type Query {
   product(where: ProductWhereUniqueInput!): Product
   products(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Product]!
   productsConnection(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ProductConnection!
+  uRL(where: URLWhereUniqueInput!): URL
+  uRLs(where: URLWhereInput, orderBy: URLOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [URL]!
+  uRLsConnection(where: URLWhereInput, orderBy: URLOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): URLConnection!
   node(id: ID!): Node
 }
 
 type Subscription {
   product(where: ProductSubscriptionWhereInput): ProductSubscriptionPayload
+  uRL(where: URLSubscriptionWhereInput): URLSubscriptionPayload
+}
+
+type URL {
+  id: ID!
+  url: String!
+  ProductAmount: Int!
+  lastPage: Int!
+  createdAt: DateTime!
+  updateAt: DateTime!
+}
+
+type URLConnection {
+  pageInfo: PageInfo!
+  edges: [URLEdge]!
+  aggregate: AggregateURL!
+}
+
+input URLCreateInput {
+  url: String!
+  ProductAmount: Int!
+  lastPage: Int!
+  updateAt: DateTime!
+}
+
+type URLEdge {
+  node: URL!
+  cursor: String!
+}
+
+enum URLOrderByInput {
+  id_ASC
+  id_DESC
+  url_ASC
+  url_DESC
+  ProductAmount_ASC
+  ProductAmount_DESC
+  lastPage_ASC
+  lastPage_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updateAt_ASC
+  updateAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type URLPreviousValues {
+  id: ID!
+  url: String!
+  ProductAmount: Int!
+  lastPage: Int!
+  createdAt: DateTime!
+  updateAt: DateTime!
+}
+
+type URLSubscriptionPayload {
+  mutation: MutationType!
+  node: URL
+  updatedFields: [String!]
+  previousValues: URLPreviousValues
+}
+
+input URLSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: URLWhereInput
+  AND: [URLSubscriptionWhereInput!]
+  OR: [URLSubscriptionWhereInput!]
+  NOT: [URLSubscriptionWhereInput!]
+}
+
+input URLUpdateInput {
+  url: String
+  ProductAmount: Int
+  lastPage: Int
+  updateAt: DateTime
+}
+
+input URLUpdateManyMutationInput {
+  url: String
+  ProductAmount: Int
+  lastPage: Int
+  updateAt: DateTime
+}
+
+input URLWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  url: String
+  url_not: String
+  url_in: [String!]
+  url_not_in: [String!]
+  url_lt: String
+  url_lte: String
+  url_gt: String
+  url_gte: String
+  url_contains: String
+  url_not_contains: String
+  url_starts_with: String
+  url_not_starts_with: String
+  url_ends_with: String
+  url_not_ends_with: String
+  ProductAmount: Int
+  ProductAmount_not: Int
+  ProductAmount_in: [Int!]
+  ProductAmount_not_in: [Int!]
+  ProductAmount_lt: Int
+  ProductAmount_lte: Int
+  ProductAmount_gt: Int
+  ProductAmount_gte: Int
+  lastPage: Int
+  lastPage_not: Int
+  lastPage_in: [Int!]
+  lastPage_not_in: [Int!]
+  lastPage_lt: Int
+  lastPage_lte: Int
+  lastPage_gt: Int
+  lastPage_gte: Int
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updateAt: DateTime
+  updateAt_not: DateTime
+  updateAt_in: [DateTime!]
+  updateAt_not_in: [DateTime!]
+  updateAt_lt: DateTime
+  updateAt_lte: DateTime
+  updateAt_gt: DateTime
+  updateAt_gte: DateTime
+  AND: [URLWhereInput!]
+  OR: [URLWhereInput!]
+  NOT: [URLWhereInput!]
+}
+
+input URLWhereUniqueInput {
+  id: ID
 }
 `

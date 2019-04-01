@@ -14,3 +14,12 @@ type Product {
   createdAt: DateTime!
   updatedAt: DateTime!
 }
+
+type URL {
+  id: ID! @unique
+  url: String!
+  ProductAmount: Int!
+  lastPage: Int!
+  createdAt: DateTime!
+  updateAt: DateTime!
+}
