@@ -163,6 +163,8 @@ export type ProductOrderByInput =
   | "title_DESC"
   | "urlKey_ASC"
   | "urlKey_DESC"
+  | "urlForCheck_ASC"
+  | "urlForCheck_DESC"
   | "imgURL_ASC"
   | "imgURL_DESC"
   | "releaseDate_ASC"
@@ -187,10 +189,10 @@ export type URLOrderByInput =
   | "lastPage_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
-  | "updateAt_ASC"
-  | "updateAt_DESC"
   | "updatedAt_ASC"
-  | "updatedAt_DESC";
+  | "updatedAt_DESC"
+  | "isComplete_ASC"
+  | "isComplete_DESC";
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
@@ -198,7 +200,7 @@ export interface URLCreateInput {
   url: String;
   ProductAmount: Int;
   lastPage: Int;
-  updateAt: DateTimeInput;
+  isComplete: Boolean;
 }
 
 export interface URLWhereInput {
@@ -254,14 +256,16 @@ export interface URLWhereInput {
   createdAt_lte?: DateTimeInput;
   createdAt_gt?: DateTimeInput;
   createdAt_gte?: DateTimeInput;
-  updateAt?: DateTimeInput;
-  updateAt_not?: DateTimeInput;
-  updateAt_in?: DateTimeInput[] | DateTimeInput;
-  updateAt_not_in?: DateTimeInput[] | DateTimeInput;
-  updateAt_lt?: DateTimeInput;
-  updateAt_lte?: DateTimeInput;
-  updateAt_gt?: DateTimeInput;
-  updateAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  isComplete?: Boolean;
+  isComplete_not?: Boolean;
   AND?: URLWhereInput[] | URLWhereInput;
   OR?: URLWhereInput[] | URLWhereInput;
   NOT?: URLWhereInput[] | URLWhereInput;
@@ -275,6 +279,7 @@ export interface ProductUpdateInput {
   name?: String;
   title?: String;
   urlKey?: String;
+  urlForCheck?: String;
   imgURL?: String;
   releaseDate?: DateTimeInput;
   retailPrice?: Int;
@@ -289,7 +294,7 @@ export interface URLUpdateInput {
   url?: String;
   ProductAmount?: Int;
   lastPage?: Int;
-  updateAt?: DateTimeInput;
+  isComplete?: Boolean;
 }
 
 export interface ProductSubscriptionWhereInput {
@@ -315,6 +320,7 @@ export interface ProductCreateInput {
   name: String;
   title: String;
   urlKey: String;
+  urlForCheck: String;
   imgURL?: String;
   releaseDate?: DateTimeInput;
   retailPrice?: Int;
@@ -434,6 +440,20 @@ export interface ProductWhereInput {
   urlKey_not_starts_with?: String;
   urlKey_ends_with?: String;
   urlKey_not_ends_with?: String;
+  urlForCheck?: String;
+  urlForCheck_not?: String;
+  urlForCheck_in?: String[] | String;
+  urlForCheck_not_in?: String[] | String;
+  urlForCheck_lt?: String;
+  urlForCheck_lte?: String;
+  urlForCheck_gt?: String;
+  urlForCheck_gte?: String;
+  urlForCheck_contains?: String;
+  urlForCheck_not_contains?: String;
+  urlForCheck_starts_with?: String;
+  urlForCheck_not_starts_with?: String;
+  urlForCheck_ends_with?: String;
+  urlForCheck_not_ends_with?: String;
   imgURL?: String;
   imgURL_not?: String;
   imgURL_in?: String[] | String;
@@ -493,6 +513,7 @@ export interface ProductUpdateManyMutationInput {
   name?: String;
   title?: String;
   urlKey?: String;
+  urlForCheck?: String;
   imgURL?: String;
   releaseDate?: DateTimeInput;
   retailPrice?: Int;
@@ -514,7 +535,7 @@ export interface URLUpdateManyMutationInput {
   url?: String;
   ProductAmount?: Int;
   lastPage?: Int;
-  updateAt?: DateTimeInput;
+  isComplete?: Boolean;
 }
 
 export interface NodeNode {
@@ -569,7 +590,8 @@ export interface URLPreviousValues {
   ProductAmount: Int;
   lastPage: Int;
   createdAt: DateTimeOutput;
-  updateAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  isComplete: Boolean;
 }
 
 export interface URLPreviousValuesPromise
@@ -580,7 +602,8 @@ export interface URLPreviousValuesPromise
   ProductAmount: () => Promise<Int>;
   lastPage: () => Promise<Int>;
   createdAt: () => Promise<DateTimeOutput>;
-  updateAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  isComplete: () => Promise<Boolean>;
 }
 
 export interface URLPreviousValuesSubscription
@@ -591,7 +614,8 @@ export interface URLPreviousValuesSubscription
   ProductAmount: () => Promise<AsyncIterator<Int>>;
   lastPage: () => Promise<AsyncIterator<Int>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updateAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  isComplete: () => Promise<AsyncIterator<Boolean>>;
 }
 
 export interface URL {
@@ -600,7 +624,8 @@ export interface URL {
   ProductAmount: Int;
   lastPage: Int;
   createdAt: DateTimeOutput;
-  updateAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  isComplete: Boolean;
 }
 
 export interface URLPromise extends Promise<URL>, Fragmentable {
@@ -609,7 +634,8 @@ export interface URLPromise extends Promise<URL>, Fragmentable {
   ProductAmount: () => Promise<Int>;
   lastPage: () => Promise<Int>;
   createdAt: () => Promise<DateTimeOutput>;
-  updateAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  isComplete: () => Promise<Boolean>;
 }
 
 export interface URLSubscription
@@ -620,7 +646,8 @@ export interface URLSubscription
   ProductAmount: () => Promise<AsyncIterator<Int>>;
   lastPage: () => Promise<AsyncIterator<Int>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updateAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  isComplete: () => Promise<AsyncIterator<Boolean>>;
 }
 
 export interface URLEdge {
@@ -707,6 +734,7 @@ export interface ProductPreviousValues {
   name: String;
   title: String;
   urlKey: String;
+  urlForCheck: String;
   imgURL?: String;
   releaseDate?: DateTimeOutput;
   retailPrice?: Int;
@@ -726,6 +754,7 @@ export interface ProductPreviousValuesPromise
   name: () => Promise<String>;
   title: () => Promise<String>;
   urlKey: () => Promise<String>;
+  urlForCheck: () => Promise<String>;
   imgURL: () => Promise<String>;
   releaseDate: () => Promise<DateTimeOutput>;
   retailPrice: () => Promise<Int>;
@@ -745,6 +774,7 @@ export interface ProductPreviousValuesSubscription
   name: () => Promise<AsyncIterator<String>>;
   title: () => Promise<AsyncIterator<String>>;
   urlKey: () => Promise<AsyncIterator<String>>;
+  urlForCheck: () => Promise<AsyncIterator<String>>;
   imgURL: () => Promise<AsyncIterator<String>>;
   releaseDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   retailPrice: () => Promise<AsyncIterator<Int>>;
@@ -762,6 +792,7 @@ export interface Product {
   name: String;
   title: String;
   urlKey: String;
+  urlForCheck: String;
   imgURL?: String;
   releaseDate?: DateTimeOutput;
   retailPrice?: Int;
@@ -779,6 +810,7 @@ export interface ProductPromise extends Promise<Product>, Fragmentable {
   name: () => Promise<String>;
   title: () => Promise<String>;
   urlKey: () => Promise<String>;
+  urlForCheck: () => Promise<String>;
   imgURL: () => Promise<String>;
   releaseDate: () => Promise<DateTimeOutput>;
   retailPrice: () => Promise<Int>;
@@ -798,6 +830,7 @@ export interface ProductSubscription
   name: () => Promise<AsyncIterator<String>>;
   title: () => Promise<AsyncIterator<String>>;
   urlKey: () => Promise<AsyncIterator<String>>;
+  urlForCheck: () => Promise<AsyncIterator<String>>;
   imgURL: () => Promise<AsyncIterator<String>>;
   releaseDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   retailPrice: () => Promise<AsyncIterator<Int>>;

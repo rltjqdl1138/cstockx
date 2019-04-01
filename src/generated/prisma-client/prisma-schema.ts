@@ -61,6 +61,7 @@ type Product {
   name: String!
   title: String!
   urlKey: String!
+  urlForCheck: String!
   imgURL: String
   releaseDate: DateTime
   retailPrice: Int
@@ -83,6 +84,7 @@ input ProductCreateInput {
   name: String!
   title: String!
   urlKey: String!
+  urlForCheck: String!
   imgURL: String
   releaseDate: DateTime
   retailPrice: Int
@@ -111,6 +113,8 @@ enum ProductOrderByInput {
   title_DESC
   urlKey_ASC
   urlKey_DESC
+  urlForCheck_ASC
+  urlForCheck_DESC
   imgURL_ASC
   imgURL_DESC
   releaseDate_ASC
@@ -134,6 +138,7 @@ type ProductPreviousValues {
   name: String!
   title: String!
   urlKey: String!
+  urlForCheck: String!
   imgURL: String
   releaseDate: DateTime
   retailPrice: Int
@@ -168,6 +173,7 @@ input ProductUpdateInput {
   name: String
   title: String
   urlKey: String
+  urlForCheck: String
   imgURL: String
   releaseDate: DateTime
   retailPrice: Int
@@ -182,6 +188,7 @@ input ProductUpdateManyMutationInput {
   name: String
   title: String
   urlKey: String
+  urlForCheck: String
   imgURL: String
   releaseDate: DateTime
   retailPrice: Int
@@ -301,6 +308,20 @@ input ProductWhereInput {
   urlKey_not_starts_with: String
   urlKey_ends_with: String
   urlKey_not_ends_with: String
+  urlForCheck: String
+  urlForCheck_not: String
+  urlForCheck_in: [String!]
+  urlForCheck_not_in: [String!]
+  urlForCheck_lt: String
+  urlForCheck_lte: String
+  urlForCheck_gt: String
+  urlForCheck_gte: String
+  urlForCheck_contains: String
+  urlForCheck_not_contains: String
+  urlForCheck_starts_with: String
+  urlForCheck_not_starts_with: String
+  urlForCheck_ends_with: String
+  urlForCheck_not_ends_with: String
   imgURL: String
   imgURL_not: String
   imgURL_in: [String!]
@@ -377,7 +398,8 @@ type URL {
   ProductAmount: Int!
   lastPage: Int!
   createdAt: DateTime!
-  updateAt: DateTime!
+  updatedAt: DateTime!
+  isComplete: Boolean!
 }
 
 type URLConnection {
@@ -390,7 +412,7 @@ input URLCreateInput {
   url: String!
   ProductAmount: Int!
   lastPage: Int!
-  updateAt: DateTime!
+  isComplete: Boolean!
 }
 
 type URLEdge {
@@ -409,10 +431,10 @@ enum URLOrderByInput {
   lastPage_DESC
   createdAt_ASC
   createdAt_DESC
-  updateAt_ASC
-  updateAt_DESC
   updatedAt_ASC
   updatedAt_DESC
+  isComplete_ASC
+  isComplete_DESC
 }
 
 type URLPreviousValues {
@@ -421,7 +443,8 @@ type URLPreviousValues {
   ProductAmount: Int!
   lastPage: Int!
   createdAt: DateTime!
-  updateAt: DateTime!
+  updatedAt: DateTime!
+  isComplete: Boolean!
 }
 
 type URLSubscriptionPayload {
@@ -446,14 +469,14 @@ input URLUpdateInput {
   url: String
   ProductAmount: Int
   lastPage: Int
-  updateAt: DateTime
+  isComplete: Boolean
 }
 
 input URLUpdateManyMutationInput {
   url: String
   ProductAmount: Int
   lastPage: Int
-  updateAt: DateTime
+  isComplete: Boolean
 }
 
 input URLWhereInput {
@@ -509,14 +532,16 @@ input URLWhereInput {
   createdAt_lte: DateTime
   createdAt_gt: DateTime
   createdAt_gte: DateTime
-  updateAt: DateTime
-  updateAt_not: DateTime
-  updateAt_in: [DateTime!]
-  updateAt_not_in: [DateTime!]
-  updateAt_lt: DateTime
-  updateAt_lte: DateTime
-  updateAt_gt: DateTime
-  updateAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  isComplete: Boolean
+  isComplete_not: Boolean
   AND: [URLWhereInput!]
   OR: [URLWhereInput!]
   NOT: [URLWhereInput!]

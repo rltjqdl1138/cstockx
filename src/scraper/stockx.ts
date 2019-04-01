@@ -1,5 +1,6 @@
 import axios from "axios";
-import { prisma } from "../generated/prisma-client";
+import { prisma, Int } from "../generated/prisma-client";
+import { totalmem } from "os";
 
 const headers = { headers: { 'User-Agent': "Mozilla/5.0" }}
 const ModelBaseURL =
@@ -50,9 +51,34 @@ const brands = [
 **/
 class StockX {
   run = async () =>{
+    const noUrls: Array<string> = []
     console.log('run')
     const a = await this.collectAll()
-    await console.log(a)
+    await console.log(`${a.length} urls exist`)
+    const b = await prisma.uRLs()
+    await console.log(`${b.length} urls registered`)
+
+    /*
+    await a.map( async (e)=>{
+      const is:boolean = await b.find((v)=>{ return v.url == e}) ? true : false;
+      if( is == false) await noUrls.push(e)
+    })
+    await noUrls.map( async (e)=>{
+      const bb = await this.checkProductURL(e)
+      if(e)
+        await console.log(bb)
+      }
+    )
+    */
+   
+    a.map( async (e)=>{
+        const bb = await this.checkProductURL(e)
+        if(bb)
+          await this.collectProductsInPage(bb.url)
+      }
+    )
+  
+    
   }
 
   createUrl = async (baseURL: string, querys: Object):Promise<string> => {
@@ -83,14 +109,56 @@ class StockX {
     return urls;
   };
 
-  collectProductsInPage = async (baseUrl: string): Promise<any> => {
+  checkProductURL = async (baseUrl: string): Promise<any> =>{
+    let newURL:any = await prisma.uRLs({where:{url:baseUrl}});
+    const response: any =
+      await axios.get(baseUrl, headers)
+      .catch(error=>console.log('\n\n[ERROR] Function checkProductURL\n',baseUrl,'\n'));
+
+    if(!response || !response.data){
+      console.log('\n[ERROR] In Function createProductURL\n');
+      return;
+    }
+    if( newURL.length > 0 && newURL[0].ProductAmount == response.data.Pagination.total){
+      const checking:any = 
+        await prisma.products({where:{urlForCheck:baseUrl}})
+      if(newURL[0].ProductAmount != checking.length){
+        await console.log('[Warning] There are unregistered data in ', baseUrl)
+        //await prisma.updateURL({data:{isComplete:false}, where:{id:newURL[0].id}})
+        //return newURL;
+      } else{
+        await console.log("[Check] There isn't unregistered data in ",baseUrl)
+        //await prisma.updateURL({data:{isComplete:true}, where:{id:newURL[0].id}})
+        //return newURL;
+      }
+      return;
+    }
+    if(newURL.length == 0){
+      const {total, lastPage} = response.data.Pagination;
+      newURL =
+        await prisma.createURL({
+          url: baseUrl,
+          ProductAmount:total,
+          lastPage,
+          isComplete: false });
+      await console.log(`Create URL information: ${total} items, ${lastPage} pages`)
+    }else{
+      console.log("[Check] There are new data in ",baseUrl)
+      newURL = newURL[0];
+    }
+    return newURL;
+  }
+
+  collectProductsInPage = async (baseUrl: string, page:Int=1): Promise<any> => {
+    if(!baseUrl){
+      console.log('[ERROR] collectProductsInPage: baseUrl is NULL')
+      return;
+    }
     // API URL including 'v3' sometimes close 
     baseUrl = await baseUrl.replace("/v3","")
-
     const response: any =
       await axios.get(baseUrl, headers)
       .catch(error=>console.log('\n\n[ERROR] Function collectProduct\n',baseUrl,'\n'))
-
     // case 1: If response is null, Recall function to resend API request
     // case 2: There is no data
     // case 3: Insert all infromation, and Apicall nextPage
@@ -99,18 +167,18 @@ class StockX {
     } else if(response.data.Pagination.total == 0) { // case 2
       return;
     } else { //case 3
-      await response.data.Products.map((product: Object) =>{
-        this.insertProduct(product) })
+      await response.data.Products.map( async (product: any) => {
+        product.url = baseUrl;
+      await this.insertProduct(product) })
       if( response.data.Pagination.nextPage )
-
         // Pagination.nextPage omits "https://stockx.com"
         // It start from "/api/...""
-        this.collectProductsInPage( "https://stockx.com"+response.data.Pagination.nextPage )
+        await this.collectProductsInPage( "https://stockx.com"+response.data.Pagination.nextPage, page+1 )
     }
   };
 
   insertProduct = async (product: any) => {
-    const { shoe, uuid, brand, category, name, urlKey, retailPrice, title } = product;
+    const { shoe, uuid, brand, category, name, urlKey, retailPrice, title, url } = product;
     const imgURL = product.imgURL ? product.media.imageUrl : ''
     const releaseDate = product.releaseDate ? product.releaseDate.split(' ')[0] : null
 
@@ -131,6 +199,7 @@ class StockX {
         imgURL,
         releaseDate,
         retailPrice,
+        urlForCheck: url,
         rawData: product
       })
       console.log(

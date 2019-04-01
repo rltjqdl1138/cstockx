@@ -7,6 +7,7 @@ type Product {
   name: String!
   title: String!
   urlKey: String!
+  urlForCheck: String!
   imgURL: String
   releaseDate: DateTime
   retailPrice: Int
@@ -21,5 +22,6 @@ type URL {
   ProductAmount: Int!
   lastPage: Int!
   createdAt: DateTime!
-  updateAt: DateTime!
+  updatedAt: DateTime!
+  isComplete: Boolean!
 }
