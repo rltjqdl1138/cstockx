@@ -375,6 +375,7 @@ input ProductWhereInput {
 
 input ProductWhereUniqueInput {
   id: ID
+  uuid: String
 }
 
 type Query {

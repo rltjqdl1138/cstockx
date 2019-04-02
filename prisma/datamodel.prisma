@@ -1,6 +1,6 @@
 type Product {
   id: ID! @unique
-  uuid: String!
+  uuid: String! @unique
   brand: String!
   category: String!
   shoe: String!

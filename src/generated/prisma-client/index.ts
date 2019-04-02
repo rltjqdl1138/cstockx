@@ -288,6 +288,7 @@ export interface ProductUpdateInput {
 
 export type ProductWhereUniqueInput = AtLeastOne<{
   id: ID_Input;
+  uuid?: String;
 }>;
 
 export interface URLUpdateInput {
@@ -667,29 +668,60 @@ export interface URLEdgeSubscription
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface ProductSubscriptionPayload {
-  mutation: MutationType;
-  node: Product;
-  updatedFields: String[];
-  previousValues: ProductPreviousValues;
+export interface Product {
+  id: ID_Output;
+  uuid: String;
+  brand: String;
+  category: String;
+  shoe: String;
+  name: String;
+  title: String;
+  urlKey: String;
+  urlForCheck: String;
+  imgURL?: String;
+  releaseDate?: DateTimeOutput;
+  retailPrice?: Int;
+  rawData: Json;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
 }
 
-export interface ProductSubscriptionPayloadPromise
-  extends Promise<ProductSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = ProductPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = ProductPreviousValuesPromise>() => T;
+export interface ProductPromise extends Promise<Product>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  uuid: () => Promise<String>;
+  brand: () => Promise<String>;
+  category: () => Promise<String>;
+  shoe: () => Promise<String>;
+  name: () => Promise<String>;
+  title: () => Promise<String>;
+  urlKey: () => Promise<String>;
+  urlForCheck: () => Promise<String>;
+  imgURL: () => Promise<String>;
+  releaseDate: () => Promise<DateTimeOutput>;
+  retailPrice: () => Promise<Int>;
+  rawData: () => Promise<Json>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
 }
 
-export interface ProductSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<ProductSubscriptionPayload>>,
+export interface ProductSubscription
+  extends Promise<AsyncIterator<Product>>,
     Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = ProductSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = ProductPreviousValuesSubscription>() => T;
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  uuid: () => Promise<AsyncIterator<String>>;
+  brand: () => Promise<AsyncIterator<String>>;
+  category: () => Promise<AsyncIterator<String>>;
+  shoe: () => Promise<AsyncIterator<String>>;
+  name: () => Promise<AsyncIterator<String>>;
+  title: () => Promise<AsyncIterator<String>>;
+  urlKey: () => Promise<AsyncIterator<String>>;
+  urlForCheck: () => Promise<AsyncIterator<String>>;
+  imgURL: () => Promise<AsyncIterator<String>>;
+  releaseDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+  retailPrice: () => Promise<AsyncIterator<Int>>;
+  rawData: () => Promise<AsyncIterator<Json>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface ProductEdge {
@@ -723,6 +755,31 @@ export interface AggregateURLSubscription
   extends Promise<AsyncIterator<AggregateURL>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface ProductSubscriptionPayload {
+  mutation: MutationType;
+  node: Product;
+  updatedFields: String[];
+  previousValues: ProductPreviousValues;
+}
+
+export interface ProductSubscriptionPayloadPromise
+  extends Promise<ProductSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = ProductPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = ProductPreviousValuesPromise>() => T;
+}
+
+export interface ProductSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<ProductSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = ProductSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = ProductPreviousValuesSubscription>() => T;
 }
 
 export interface ProductPreviousValues {
@@ -765,62 +822,6 @@ export interface ProductPreviousValuesPromise
 
 export interface ProductPreviousValuesSubscription
   extends Promise<AsyncIterator<ProductPreviousValues>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  uuid: () => Promise<AsyncIterator<String>>;
-  brand: () => Promise<AsyncIterator<String>>;
-  category: () => Promise<AsyncIterator<String>>;
-  shoe: () => Promise<AsyncIterator<String>>;
-  name: () => Promise<AsyncIterator<String>>;
-  title: () => Promise<AsyncIterator<String>>;
-  urlKey: () => Promise<AsyncIterator<String>>;
-  urlForCheck: () => Promise<AsyncIterator<String>>;
-  imgURL: () => Promise<AsyncIterator<String>>;
-  releaseDate: () => Promise<AsyncIterator<DateTimeOutput>>;
-  retailPrice: () => Promise<AsyncIterator<Int>>;
-  rawData: () => Promise<AsyncIterator<Json>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-}
-
-export interface Product {
-  id: ID_Output;
-  uuid: String;
-  brand: String;
-  category: String;
-  shoe: String;
-  name: String;
-  title: String;
-  urlKey: String;
-  urlForCheck: String;
-  imgURL?: String;
-  releaseDate?: DateTimeOutput;
-  retailPrice?: Int;
-  rawData: Json;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-}
-
-export interface ProductPromise extends Promise<Product>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  uuid: () => Promise<String>;
-  brand: () => Promise<String>;
-  category: () => Promise<String>;
-  shoe: () => Promise<String>;
-  name: () => Promise<String>;
-  title: () => Promise<String>;
-  urlKey: () => Promise<String>;
-  urlForCheck: () => Promise<String>;
-  imgURL: () => Promise<String>;
-  releaseDate: () => Promise<DateTimeOutput>;
-  retailPrice: () => Promise<Int>;
-  rawData: () => Promise<Json>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-}
-
-export interface ProductSubscription
-  extends Promise<AsyncIterator<Product>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   uuid: () => Promise<AsyncIterator<String>>;
@@ -931,6 +932,11 @@ The `Boolean` scalar type represents `true` or `false`.
 */
 export type Boolean = boolean;
 
+/*
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+*/
+export type String = string;
+
 export type Long = string;
 
 /*
@@ -948,11 +954,6 @@ export type DateTimeInput = Date | string;
 DateTime scalar output type, which is always a string
 */
 export type DateTimeOutput = string;
-
-/*
-The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-*/
-export type String = string;
 
 /**
  * Model Metadata

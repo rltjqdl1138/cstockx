@@ -57,7 +57,6 @@ class StockX {
     await console.log(`${a.length} urls exist`)
     const b = await prisma.uRLs()
     await console.log(`${b.length} urls registered`)
-
     const c = await prisma.uRLs({where:{isComplete:false}})
     await console.log(`${c.length} urls need to update`)
     
@@ -69,14 +68,38 @@ class StockX {
     */
     /*
     await c.map( async (e)=>{
-      const bb = await this.checkProductURL(e.url)
-      
+      setTimeout(async ()=>{ await this.checkProductURL(e.url)},10000)
     })
     */
+   /*
+   const dd = await prisma.uRLs()
+   await dd.map((e)=>{
+     console.log(e.ProductAmount)
+   })*/
+
+    //const DoneStr: Array<string> = [];
+    //const CollectStr: Array<string> = [];
     
-    await c.map( async (e)=>{
-      await this.collectProductsInPage(e.url)
+    await b.map( async (e)=>{
+      const status = await this.checkProductURL(e.url);
+      if(status == 'Done'){
+        //await DoneStr.push(e.url);
+      } else if('Collect'){
+        //await CollectStr.push(e.url);
+      } else if('Error'){
+        //
+      }
     })
+  
+ /*
+    await c.map( async (e)=>{
+      this.collectProductsInPage(e.url)
+    })*/
+   /*
+    await c.map( async (e)=>{
+      setTimeout(async ()=>{ await this.collectProductsInPage(e.url)}, 1000)
+    })*/
+    
     
     
   }
@@ -102,7 +125,6 @@ class StockX {
     await _tags.map( async (e:string)=> {
       years.map( async (year:string) => {
         const url = await this.createUrl(ModelBaseURL, {_tags:e, year})
-        //console.log(url)
         urls.push( url )
       })
     })
@@ -117,19 +139,23 @@ class StockX {
 
     if(!response || !response.data){
       console.log('\n[ERROR] In Function createProductURL\n');
-      return;
+      return 'Error';
     }
     if( newURL.length > 0 && newURL[0].ProductAmount == response.data.Pagination.total){
       const checking:any = 
         await prisma.products({where:{urlForCheck:baseUrl}})
-      if(newURL[0].ProductAmount != checking.length){
+      if(newURL[0].ProductAmount > checking.length){
         await console.log('[Warning] There are unregistered data in ', baseUrl)
-        //await prisma.updateURL({data:{isComplete:false}, where:{id:newURL[0].id}})
-        //return newURL;
-      } else{
+        await prisma.updateURL({data:{isComplete:false}, where:{id:newURL[0].id}})
+        return 'Collect';
+      }else if(newURL[0].ProductAmount < checking.length){
+        await console.log('[Warning] There are too much data in ', baseUrl)
+        await prisma.updateURL({data:{isComplete:false}, where:{id:newURL[0].id}})
+        return 'Collect';
+      }else{
         await console.log("[Check] There isn't unregistered data in ",baseUrl)
-        //await prisma.updateURL({data:{isComplete:true}, where:{id:newURL[0].id}})
-        //return newURL;
+        await prisma.updateURL({data:{isComplete:true}, where:{id:newURL[0].id}})
+        return 'Done';
       }
       return;
     }
@@ -144,9 +170,10 @@ class StockX {
       await console.log(`Create URL information: ${total} items, ${lastPage} pages`)
     }else{
       console.log("[Check] There are new data in ",baseUrl)
+      await prisma.updateURL({data:{isComplete:false, ProductAmount:response.data.Pagination.total}, where:{id:newURL[0].id}})
       newURL = newURL[0];
     }
-    return newURL;
+    return 'Collect';
   }
 
   collectProductsInPage = async (baseUrl: string, page:Int=1): Promise<any> => {
@@ -163,7 +190,7 @@ class StockX {
     // case 2: There is no data
     // case 3: Insert all infromation, and Apicall nextPage
     if(!response || !response.data) {  // case 1
-      return setTimeout(()=>this.collectProductsInPage(baseUrl, page),1000)
+      setTimeout(()=>this.collectProductsInPage(baseUrl, page+1),1000)
     } else if(response.data.Pagination.total == 0) { // case 2
       return;
     } else { //case 3
@@ -173,7 +200,7 @@ class StockX {
       if( response.data.Pagination.nextPage )
         // Pagination.nextPage omits "https://stockx.com"
         // It start from "/api/...""
-        await this.collectProductsInPage( baseUrl, page+1 )
+        setTimeout(()=>{this.collectProductsInPage( baseUrl, page+1 )},1000)
     }
   };
 
@@ -188,7 +215,7 @@ class StockX {
         //console.log(`[Pass] ${title} is already registered`)
         return
       };
-      await prisma.createProduct({
+      const newProduct = await prisma.createProduct({
         uuid,
         brand,
         category,
@@ -201,13 +228,13 @@ class StockX {
         retailPrice,
         urlForCheck: url,
         rawData: product
-      }).catch(e=>console.log(e))
-      //console.log(
-      //  `[Created] new product: ${newProduct.title} (ID: ${newProduct.id})`
-      //)
+      })
+      console.log(
+        `[Created] new product: ${newProduct.title} (ID: ${newProduct.id})`
+      )
     } catch(e){
-      console.log(e)
-      console.log(e.result.errors)
+      //console.log(e)
+      //console.log(e.result.errors)
       console.log(`[ERROR] Not Created ${title}`)
     }
   };
