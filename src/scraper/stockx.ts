@@ -58,26 +58,26 @@ class StockX {
     const b = await prisma.uRLs()
     await console.log(`${b.length} urls registered`)
 
+    const c = await prisma.uRLs({where:{isComplete:false}})
+    await console.log(`${c.length} urls need to update`)
+    
     /*
     await a.map( async (e)=>{
       const is:boolean = await b.find((v)=>{ return v.url == e}) ? true : false;
       if( is == false) await noUrls.push(e)
     })
-    await noUrls.map( async (e)=>{
-      const bb = await this.checkProductURL(e)
-      if(e)
-        await console.log(bb)
-      }
-    )
     */
-   
-    a.map( async (e)=>{
-        const bb = await this.checkProductURL(e)
-        if(bb)
-          await this.collectProductsInPage(bb.url)
-      }
-    )
-  
+    /*
+    await c.map( async (e)=>{
+      const bb = await this.checkProductURL(e.url)
+      
+    })
+    */
+    
+    await c.map( async (e)=>{
+      await this.collectProductsInPage(e.url)
+    })
+    
     
   }
 
@@ -155,15 +155,15 @@ class StockX {
       return;
     }
     // API URL including 'v3' sometimes close 
-    baseUrl = await baseUrl.replace("/v3","")
+    const currentUrl = await this.createUrl(baseUrl,{page})
     const response: any =
-      await axios.get(baseUrl, headers)
-      .catch(error=>console.log('\n\n[ERROR] Function collectProduct\n',baseUrl,'\n'))
+      await axios.get(currentUrl, headers)
+      .catch(error=>console.log('\n[ERROR] Function collectProduct',currentUrl,'\n'))
     // case 1: If response is null, Recall function to resend API request
     // case 2: There is no data
     // case 3: Insert all infromation, and Apicall nextPage
     if(!response || !response.data) {  // case 1
-      return setTimeout(()=>this.collectProductsInPage(baseUrl),1000)
+      return setTimeout(()=>this.collectProductsInPage(baseUrl, page),1000)
     } else if(response.data.Pagination.total == 0) { // case 2
       return;
     } else { //case 3
@@ -173,7 +173,7 @@ class StockX {
       if( response.data.Pagination.nextPage )
         // Pagination.nextPage omits "https://stockx.com"
         // It start from "/api/...""
-        await this.collectProductsInPage( "https://stockx.com"+response.data.Pagination.nextPage, page+1 )
+        await this.collectProductsInPage( baseUrl, page+1 )
     }
   };
 
@@ -181,14 +181,14 @@ class StockX {
     const { shoe, uuid, brand, category, name, urlKey, retailPrice, title, url } = product;
     const imgURL = product.imgURL ? product.media.imageUrl : ''
     const releaseDate = product.releaseDate ? product.releaseDate.split(' ')[0] : null
-
+    
     try{
       const a = await prisma.products( {where:{uuid} })
       if(a.length >= 1) {
         //console.log(`[Pass] ${title} is already registered`)
         return
       };
-      const newProduct = await prisma.createProduct({
+      await prisma.createProduct({
         uuid,
         brand,
         category,
@@ -201,12 +201,13 @@ class StockX {
         retailPrice,
         urlForCheck: url,
         rawData: product
-      })
-      console.log(
-        `Created new product: ${newProduct.title} (ID: ${newProduct.id})`
-      )
+      }).catch(e=>console.log(e))
+      //console.log(
+      //  `[Created] new product: ${newProduct.title} (ID: ${newProduct.id})`
+      //)
     } catch(e){
-      //console.log(e)
+      console.log(e)
+      console.log(e.result.errors)
       console.log(`[ERROR] Not Created ${title}`)
     }
   };
