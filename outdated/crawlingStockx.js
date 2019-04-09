@@ -15,8 +15,8 @@ const fs = require('fs');
 **/
 var brands = [
 		{	name: 'adidas',
-			models:	['yeezy', 'ultra%20boost', 'nmd', 'iniki', 'other'] },
-		{	name: 'air%20jordan',
+			models:	['yeezy', 'ultra%20boost', 'nmd', 'iniki', 'other'] } ]//,
+/*		{	name: 'air%20jordan',
 			models: [ 'packs', 'spizike',
 					'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine','ten',
 					'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty',
@@ -42,7 +42,7 @@ var brands = [
 			models: ['saucony']},
 		{	name: 'under%20armour',
 			models: ['under%20armour']}
-]
+]*/
 
 
 /*
