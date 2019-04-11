@@ -1,31 +1,18 @@
 import axios from "axios";
-import { prisma, Int } from "../generated/prisma-client";
+import { prisma, Int, Product } from "../generated/prisma-client";
+const Categories = require("../DBdata/category.js")
+const brands = require('../DBdata/brand.js')
 import { totalmem } from "os";
 import { URL } from "url";
 const https = require('https')
 import { makePrismaClientClass } from "prisma-client-lib";
+import { stringify } from "querystring";
 
 const headers = { headers: { 'User-Agent': "Mozilla/5.0" }}
 const ModelBaseURL =
   "https://stockx.com/api/browse?productCategory=sneakers&sort=release_date&order=DESC";
 const years: Array<string> = 
   ['2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019']
-const brands = [
-  {	name: 'adidas',
-		models:	['yeezy', 'ultra%20boost', 'nmd', 'iniki', 'other']},
-	{	name: 'air%20jordan',
-		models: [ 'packs', 'spizike',
-				'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine','ten',
-				'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty',
-				'twenty-one', 'twenty-two', 'twenty-three', 'twenty-eight', 'twenty-nine', 'thirty',
-				'thirty-one', 'thirty-two', 'thirty-three', 'other']},
-	{ name: 'nike',
-		models: ['foamposite', 'kd', 'kobe', 'lebron', 'air%20force', 'air%20max', 'nike%20basketball', 'nike%20sb', 'other'] },
- { name: 'other%20brands',
-    models: ['asics','diadora','li%20ning','louis%20vuitton', 'new%20balance', 'puma', 'reebok','saucony','under%20armour','vans','converse','other']
-}
-]
-    
 
 /*
  * @ Class StockX
@@ -49,22 +36,19 @@ class StockX {
   }
   
   run = async () =>{
-    console.log('run')
-
-    const noUrls: Array<string> = []
-    const initialUrls = await this.collectAll()
-    const savedUrls = await prisma.uRLs()
-    const incompletedUrls = await prisma.uRLs({where:{isComplete:false}})
+    const initialUrls = await this.collectAllProduct()
+    //const savedUrls = await prisma.uRLs()
+    //const incompletedUrls = await prisma.uRLs({where:{isComplete:false}})
 
     console.log(`${initialUrls.length} urls exist`)
-    console.log(`${savedUrls.length} urls registered`)
-    console.log(`${incompletedUrls.length} urls need to update`)
+    //console.log(`${savedUrls.length} urls registered`)
+    //console.log(`${incompletedUrls.length} urls need to update`)
 
-    const collectProducts = async ( urls ) => {
-      await synkCallbackFunction(urls, async param => collectProductInPage(param))
+    const collectingData = async ( urls:Array<string>, callbacks:Function ) => {
+      await synkCallbackFunction(urls, async param => callbacks(param))
     }
 
-    const synkCallbackFunction = async (params, callback) => {
+    const synkCallbackFunction = async (params:Array<string>, callback:Function) => {
       for(let i=0; i<params.length; i++)
         callback(params[i],i,params)
     }
@@ -89,7 +73,7 @@ class StockX {
       pages.reduce(
         (pre:Promise<void>, curV:string, curI:Int, array:Array<string>):Promise<void> =>{
           return pre.then( async() => {
-            const url = this.createUrl(param,{page:curV})
+            const url = this.createProductUrl(param,{page:curV})
             await axios.get(url, headers)
               .then((response)=>{  
                 response.data.Products.map( (product: any) => {
@@ -100,20 +84,17 @@ class StockX {
           })
       },Promise.resolve())
     }
-
-    collectProducts(initialUrls)
-    
-    
+    collectingData(initialUrls, collectProductInPage)
   }
 
-  createUrl = (baseURL: string, querys: Object):string => {
+  createProductUrl = (baseURL: string, querys: Object):string => {
     Object.keys(querys).forEach((e:string)=>{
       baseURL += `&${e}=${querys[e]}`
     })
     return baseURL;
   }
 
-  collectAll = ():Array<string> => {
+  collectAllProduct = ():Array<string> => {
     const _tags:Array<string> = [];
     const urls:Array<string> = [];
     brands.map((e:{name:string, models:Array<string>})=>{
@@ -126,7 +107,7 @@ class StockX {
     })
     _tags.map( async (e:string)=> {
       years.map( (year:string) => {
-        const url = this.createUrl(ModelBaseURL, {_tags:e, year})
+        const url = this.createProductUrl(ModelBaseURL, {_tags:e, year})
         urls.push( url )
       })
     })
@@ -138,6 +119,7 @@ class StockX {
     const imgURL = product.media.imgURL ? product.media.imageUrl : ''
     const releaseDate = product.releaseDate ? product.releaseDate.split(' ')[0] : null
     const retailPrice:Int = Number(product.retailPrice)
+
     try{
       const a = await prisma.products( {where:{uuid} })
       if(a.length >= 1) {
@@ -162,12 +144,10 @@ class StockX {
         `[Created] new product: ${newProduct.title} (ID: ${newProduct.id})`
       )
     } catch(e){
-      //console.log(e)
-      //console.log(e.result.errors)
       console.log(`[ERROR] Not Created ${title}\n${e}`)
     }
-  };
-
+  }
+  
   /*
   checkProductURL = async (baseUrl: string): Promise<any> =>{
       let newURL:any = await prisma.uRLs({where:{url:baseUrl}});

@@ -15,6 +15,8 @@ export type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
 
 export interface Exists {
   product: (where?: ProductWhereInput) => Promise<boolean>;
+  transaction: (where?: TransactionWhereInput) => Promise<boolean>;
+  transactionRaw: (where?: TransactionRawWhereInput) => Promise<boolean>;
   uRL: (where?: URLWhereInput) => Promise<boolean>;
 }
 
@@ -60,6 +62,54 @@ export interface Prisma {
       last?: Int;
     }
   ) => ProductConnectionPromise;
+  transaction: (where: TransactionWhereUniqueInput) => TransactionPromise;
+  transactions: (
+    args?: {
+      where?: TransactionWhereInput;
+      orderBy?: TransactionOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => FragmentableArray<Transaction>;
+  transactionsConnection: (
+    args?: {
+      where?: TransactionWhereInput;
+      orderBy?: TransactionOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => TransactionConnectionPromise;
+  transactionRaw: (
+    where: TransactionRawWhereUniqueInput
+  ) => TransactionRawPromise;
+  transactionRaws: (
+    args?: {
+      where?: TransactionRawWhereInput;
+      orderBy?: TransactionRawOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => FragmentableArray<TransactionRaw>;
+  transactionRawsConnection: (
+    args?: {
+      where?: TransactionRawWhereInput;
+      orderBy?: TransactionRawOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => TransactionRawConnectionPromise;
   uRL: (where: URLWhereUniqueInput) => URLPromise;
   uRLs: (
     args?: {
@@ -105,6 +155,55 @@ export interface Prisma {
   ) => ProductPromise;
   deleteProduct: (where: ProductWhereUniqueInput) => ProductPromise;
   deleteManyProducts: (where?: ProductWhereInput) => BatchPayloadPromise;
+  createTransaction: (data: TransactionCreateInput) => TransactionPromise;
+  updateTransaction: (
+    args: { data: TransactionUpdateInput; where: TransactionWhereUniqueInput }
+  ) => TransactionPromise;
+  updateManyTransactions: (
+    args: {
+      data: TransactionUpdateManyMutationInput;
+      where?: TransactionWhereInput;
+    }
+  ) => BatchPayloadPromise;
+  upsertTransaction: (
+    args: {
+      where: TransactionWhereUniqueInput;
+      create: TransactionCreateInput;
+      update: TransactionUpdateInput;
+    }
+  ) => TransactionPromise;
+  deleteTransaction: (where: TransactionWhereUniqueInput) => TransactionPromise;
+  deleteManyTransactions: (
+    where?: TransactionWhereInput
+  ) => BatchPayloadPromise;
+  createTransactionRaw: (
+    data: TransactionRawCreateInput
+  ) => TransactionRawPromise;
+  updateTransactionRaw: (
+    args: {
+      data: TransactionRawUpdateInput;
+      where: TransactionRawWhereUniqueInput;
+    }
+  ) => TransactionRawPromise;
+  updateManyTransactionRaws: (
+    args: {
+      data: TransactionRawUpdateManyMutationInput;
+      where?: TransactionRawWhereInput;
+    }
+  ) => BatchPayloadPromise;
+  upsertTransactionRaw: (
+    args: {
+      where: TransactionRawWhereUniqueInput;
+      create: TransactionRawCreateInput;
+      update: TransactionRawUpdateInput;
+    }
+  ) => TransactionRawPromise;
+  deleteTransactionRaw: (
+    where: TransactionRawWhereUniqueInput
+  ) => TransactionRawPromise;
+  deleteManyTransactionRaws: (
+    where?: TransactionRawWhereInput
+  ) => BatchPayloadPromise;
   createURL: (data: URLCreateInput) => URLPromise;
   updateURL: (
     args: { data: URLUpdateInput; where: URLWhereUniqueInput }
@@ -133,6 +232,12 @@ export interface Subscription {
   product: (
     where?: ProductSubscriptionWhereInput
   ) => ProductSubscriptionPayloadSubscription;
+  transaction: (
+    where?: TransactionSubscriptionWhereInput
+  ) => TransactionSubscriptionPayloadSubscription;
+  transactionRaw: (
+    where?: TransactionRawSubscriptionWhereInput
+  ) => TransactionRawSubscriptionPayloadSubscription;
   uRL: (
     where?: URLSubscriptionWhereInput
   ) => URLSubscriptionPayloadSubscription;
@@ -178,6 +283,48 @@ export type ProductOrderByInput =
   | "updatedAt_ASC"
   | "updatedAt_DESC";
 
+export type TransactionOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "chainId_ASC"
+  | "chainId_DESC"
+  | "date_ASC"
+  | "date_DESC"
+  | "shoeSize_ASC"
+  | "shoeSize_DESC"
+  | "productId_ASC"
+  | "productId_DESC"
+  | "skuUuid_ASC"
+  | "skuUuid_DESC"
+  | "localAmount_ASC"
+  | "localAmount_DESC"
+  | "localCurrency_ASC"
+  | "localCurrency_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
+
+export type TransactionRawOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "url_ASC"
+  | "url_DESC"
+  | "uuid_ASC"
+  | "uuid_DESC"
+  | "amount_ASC"
+  | "amount_DESC"
+  | "category_ASC"
+  | "category_DESC"
+  | "rawData_ASC"
+  | "rawData_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
+
+export type MutationType = "CREATED" | "UPDATED" | "DELETED";
+
 export type URLOrderByInput =
   | "id_ASC"
   | "id_DESC"
@@ -194,137 +341,16 @@ export type URLOrderByInput =
   | "isComplete_ASC"
   | "isComplete_DESC";
 
-export type MutationType = "CREATED" | "UPDATED" | "DELETED";
-
-export interface URLCreateInput {
-  url: String;
-  ProductAmount: Int;
-  lastPage: Int;
-  isComplete: Boolean;
-}
-
-export interface URLWhereInput {
-  id?: ID_Input;
-  id_not?: ID_Input;
-  id_in?: ID_Input[] | ID_Input;
-  id_not_in?: ID_Input[] | ID_Input;
-  id_lt?: ID_Input;
-  id_lte?: ID_Input;
-  id_gt?: ID_Input;
-  id_gte?: ID_Input;
-  id_contains?: ID_Input;
-  id_not_contains?: ID_Input;
-  id_starts_with?: ID_Input;
-  id_not_starts_with?: ID_Input;
-  id_ends_with?: ID_Input;
-  id_not_ends_with?: ID_Input;
-  url?: String;
-  url_not?: String;
-  url_in?: String[] | String;
-  url_not_in?: String[] | String;
-  url_lt?: String;
-  url_lte?: String;
-  url_gt?: String;
-  url_gte?: String;
-  url_contains?: String;
-  url_not_contains?: String;
-  url_starts_with?: String;
-  url_not_starts_with?: String;
-  url_ends_with?: String;
-  url_not_ends_with?: String;
-  ProductAmount?: Int;
-  ProductAmount_not?: Int;
-  ProductAmount_in?: Int[] | Int;
-  ProductAmount_not_in?: Int[] | Int;
-  ProductAmount_lt?: Int;
-  ProductAmount_lte?: Int;
-  ProductAmount_gt?: Int;
-  ProductAmount_gte?: Int;
-  lastPage?: Int;
-  lastPage_not?: Int;
-  lastPage_in?: Int[] | Int;
-  lastPage_not_in?: Int[] | Int;
-  lastPage_lt?: Int;
-  lastPage_lte?: Int;
-  lastPage_gt?: Int;
-  lastPage_gte?: Int;
-  createdAt?: DateTimeInput;
-  createdAt_not?: DateTimeInput;
-  createdAt_in?: DateTimeInput[] | DateTimeInput;
-  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
-  createdAt_lt?: DateTimeInput;
-  createdAt_lte?: DateTimeInput;
-  createdAt_gt?: DateTimeInput;
-  createdAt_gte?: DateTimeInput;
-  updatedAt?: DateTimeInput;
-  updatedAt_not?: DateTimeInput;
-  updatedAt_in?: DateTimeInput[] | DateTimeInput;
-  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
-  updatedAt_lt?: DateTimeInput;
-  updatedAt_lte?: DateTimeInput;
-  updatedAt_gt?: DateTimeInput;
-  updatedAt_gte?: DateTimeInput;
-  isComplete?: Boolean;
-  isComplete_not?: Boolean;
-  AND?: URLWhereInput[] | URLWhereInput;
-  OR?: URLWhereInput[] | URLWhereInput;
-  NOT?: URLWhereInput[] | URLWhereInput;
-}
-
-export interface ProductUpdateInput {
-  uuid?: String;
-  brand?: String;
-  category?: String;
-  shoe?: String;
-  name?: String;
-  title?: String;
-  urlKey?: String;
-  urlForCheck?: String;
-  imgURL?: String;
-  releaseDate?: DateTimeInput;
-  retailPrice?: Int;
-  rawData?: Json;
-}
-
 export type ProductWhereUniqueInput = AtLeastOne<{
   id: ID_Input;
   uuid?: String;
 }>;
 
-export interface URLUpdateInput {
-  url?: String;
-  ProductAmount?: Int;
-  lastPage?: Int;
-  isComplete?: Boolean;
-}
-
-export interface ProductSubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: ProductWhereInput;
-  AND?: ProductSubscriptionWhereInput[] | ProductSubscriptionWhereInput;
-  OR?: ProductSubscriptionWhereInput[] | ProductSubscriptionWhereInput;
-  NOT?: ProductSubscriptionWhereInput[] | ProductSubscriptionWhereInput;
-}
-
-export type URLWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
-}>;
-
-export interface ProductCreateInput {
+export interface TransactionRawCreateInput {
+  url: String;
   uuid: String;
-  brand: String;
+  amount: Int;
   category: String;
-  shoe: String;
-  name: String;
-  title: String;
-  urlKey: String;
-  urlForCheck: String;
-  imgURL?: String;
-  releaseDate?: DateTimeInput;
-  retailPrice?: Int;
   rawData: Json;
 }
 
@@ -506,6 +532,177 @@ export interface ProductWhereInput {
   NOT?: ProductWhereInput[] | ProductWhereInput;
 }
 
+export interface TransactionUpdateManyMutationInput {
+  chainId?: String;
+  date?: String;
+  shoeSize?: String;
+  productId?: String;
+  skuUuid?: String;
+  localAmount?: String;
+  localCurrency?: String;
+}
+
+export interface TransactionRawSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: TransactionRawWhereInput;
+  AND?:
+    | TransactionRawSubscriptionWhereInput[]
+    | TransactionRawSubscriptionWhereInput;
+  OR?:
+    | TransactionRawSubscriptionWhereInput[]
+    | TransactionRawSubscriptionWhereInput;
+  NOT?:
+    | TransactionRawSubscriptionWhereInput[]
+    | TransactionRawSubscriptionWhereInput;
+}
+
+export type TransactionRawWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+  url?: String;
+}>;
+
+export interface ProductSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: ProductWhereInput;
+  AND?: ProductSubscriptionWhereInput[] | ProductSubscriptionWhereInput;
+  OR?: ProductSubscriptionWhereInput[] | ProductSubscriptionWhereInput;
+  NOT?: ProductSubscriptionWhereInput[] | ProductSubscriptionWhereInput;
+}
+
+export interface TransactionUpdateInput {
+  chainId?: String;
+  date?: String;
+  shoeSize?: String;
+  productId?: String;
+  skuUuid?: String;
+  localAmount?: String;
+  localCurrency?: String;
+}
+
+export interface URLUpdateInput {
+  url?: String;
+  ProductAmount?: Int;
+  lastPage?: Int;
+  isComplete?: Boolean;
+}
+
+export interface TransactionRawWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  url?: String;
+  url_not?: String;
+  url_in?: String[] | String;
+  url_not_in?: String[] | String;
+  url_lt?: String;
+  url_lte?: String;
+  url_gt?: String;
+  url_gte?: String;
+  url_contains?: String;
+  url_not_contains?: String;
+  url_starts_with?: String;
+  url_not_starts_with?: String;
+  url_ends_with?: String;
+  url_not_ends_with?: String;
+  uuid?: String;
+  uuid_not?: String;
+  uuid_in?: String[] | String;
+  uuid_not_in?: String[] | String;
+  uuid_lt?: String;
+  uuid_lte?: String;
+  uuid_gt?: String;
+  uuid_gte?: String;
+  uuid_contains?: String;
+  uuid_not_contains?: String;
+  uuid_starts_with?: String;
+  uuid_not_starts_with?: String;
+  uuid_ends_with?: String;
+  uuid_not_ends_with?: String;
+  amount?: Int;
+  amount_not?: Int;
+  amount_in?: Int[] | Int;
+  amount_not_in?: Int[] | Int;
+  amount_lt?: Int;
+  amount_lte?: Int;
+  amount_gt?: Int;
+  amount_gte?: Int;
+  category?: String;
+  category_not?: String;
+  category_in?: String[] | String;
+  category_not_in?: String[] | String;
+  category_lt?: String;
+  category_lte?: String;
+  category_gt?: String;
+  category_gte?: String;
+  category_contains?: String;
+  category_not_contains?: String;
+  category_starts_with?: String;
+  category_not_starts_with?: String;
+  category_ends_with?: String;
+  category_not_ends_with?: String;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  AND?: TransactionRawWhereInput[] | TransactionRawWhereInput;
+  OR?: TransactionRawWhereInput[] | TransactionRawWhereInput;
+  NOT?: TransactionRawWhereInput[] | TransactionRawWhereInput;
+}
+
+export interface URLCreateInput {
+  url: String;
+  ProductAmount: Int;
+  lastPage: Int;
+  isComplete: Boolean;
+}
+
+export interface TransactionCreateInput {
+  chainId: String;
+  date: String;
+  shoeSize: String;
+  productId: String;
+  skuUuid: String;
+  localAmount: String;
+  localCurrency: String;
+}
+
+export interface TransactionRawUpdateManyMutationInput {
+  url?: String;
+  uuid?: String;
+  amount?: Int;
+  category?: String;
+  rawData?: Json;
+}
+
 export interface ProductUpdateManyMutationInput {
   uuid?: String;
   brand?: String;
@@ -532,6 +729,21 @@ export interface URLSubscriptionWhereInput {
   NOT?: URLSubscriptionWhereInput[] | URLSubscriptionWhereInput;
 }
 
+export interface ProductUpdateInput {
+  uuid?: String;
+  brand?: String;
+  category?: String;
+  shoe?: String;
+  name?: String;
+  title?: String;
+  urlKey?: String;
+  urlForCheck?: String;
+  imgURL?: String;
+  releaseDate?: DateTimeInput;
+  retailPrice?: Int;
+  rawData?: Json;
+}
+
 export interface URLUpdateManyMutationInput {
   url?: String;
   ProductAmount?: Int;
@@ -539,50 +751,268 @@ export interface URLUpdateManyMutationInput {
   isComplete?: Boolean;
 }
 
+export interface URLWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  url?: String;
+  url_not?: String;
+  url_in?: String[] | String;
+  url_not_in?: String[] | String;
+  url_lt?: String;
+  url_lte?: String;
+  url_gt?: String;
+  url_gte?: String;
+  url_contains?: String;
+  url_not_contains?: String;
+  url_starts_with?: String;
+  url_not_starts_with?: String;
+  url_ends_with?: String;
+  url_not_ends_with?: String;
+  ProductAmount?: Int;
+  ProductAmount_not?: Int;
+  ProductAmount_in?: Int[] | Int;
+  ProductAmount_not_in?: Int[] | Int;
+  ProductAmount_lt?: Int;
+  ProductAmount_lte?: Int;
+  ProductAmount_gt?: Int;
+  ProductAmount_gte?: Int;
+  lastPage?: Int;
+  lastPage_not?: Int;
+  lastPage_in?: Int[] | Int;
+  lastPage_not_in?: Int[] | Int;
+  lastPage_lt?: Int;
+  lastPage_lte?: Int;
+  lastPage_gt?: Int;
+  lastPage_gte?: Int;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  isComplete?: Boolean;
+  isComplete_not?: Boolean;
+  AND?: URLWhereInput[] | URLWhereInput;
+  OR?: URLWhereInput[] | URLWhereInput;
+  NOT?: URLWhereInput[] | URLWhereInput;
+}
+
+export type URLWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
+export interface ProductCreateInput {
+  uuid: String;
+  brand: String;
+  category: String;
+  shoe: String;
+  name: String;
+  title: String;
+  urlKey: String;
+  urlForCheck: String;
+  imgURL?: String;
+  releaseDate?: DateTimeInput;
+  retailPrice?: Int;
+  rawData: Json;
+}
+
+export type TransactionWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
+export interface TransactionSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: TransactionWhereInput;
+  AND?: TransactionSubscriptionWhereInput[] | TransactionSubscriptionWhereInput;
+  OR?: TransactionSubscriptionWhereInput[] | TransactionSubscriptionWhereInput;
+  NOT?: TransactionSubscriptionWhereInput[] | TransactionSubscriptionWhereInput;
+}
+
+export interface TransactionRawUpdateInput {
+  url?: String;
+  uuid?: String;
+  amount?: Int;
+  category?: String;
+  rawData?: Json;
+}
+
+export interface TransactionWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  chainId?: String;
+  chainId_not?: String;
+  chainId_in?: String[] | String;
+  chainId_not_in?: String[] | String;
+  chainId_lt?: String;
+  chainId_lte?: String;
+  chainId_gt?: String;
+  chainId_gte?: String;
+  chainId_contains?: String;
+  chainId_not_contains?: String;
+  chainId_starts_with?: String;
+  chainId_not_starts_with?: String;
+  chainId_ends_with?: String;
+  chainId_not_ends_with?: String;
+  date?: String;
+  date_not?: String;
+  date_in?: String[] | String;
+  date_not_in?: String[] | String;
+  date_lt?: String;
+  date_lte?: String;
+  date_gt?: String;
+  date_gte?: String;
+  date_contains?: String;
+  date_not_contains?: String;
+  date_starts_with?: String;
+  date_not_starts_with?: String;
+  date_ends_with?: String;
+  date_not_ends_with?: String;
+  shoeSize?: String;
+  shoeSize_not?: String;
+  shoeSize_in?: String[] | String;
+  shoeSize_not_in?: String[] | String;
+  shoeSize_lt?: String;
+  shoeSize_lte?: String;
+  shoeSize_gt?: String;
+  shoeSize_gte?: String;
+  shoeSize_contains?: String;
+  shoeSize_not_contains?: String;
+  shoeSize_starts_with?: String;
+  shoeSize_not_starts_with?: String;
+  shoeSize_ends_with?: String;
+  shoeSize_not_ends_with?: String;
+  productId?: String;
+  productId_not?: String;
+  productId_in?: String[] | String;
+  productId_not_in?: String[] | String;
+  productId_lt?: String;
+  productId_lte?: String;
+  productId_gt?: String;
+  productId_gte?: String;
+  productId_contains?: String;
+  productId_not_contains?: String;
+  productId_starts_with?: String;
+  productId_not_starts_with?: String;
+  productId_ends_with?: String;
+  productId_not_ends_with?: String;
+  skuUuid?: String;
+  skuUuid_not?: String;
+  skuUuid_in?: String[] | String;
+  skuUuid_not_in?: String[] | String;
+  skuUuid_lt?: String;
+  skuUuid_lte?: String;
+  skuUuid_gt?: String;
+  skuUuid_gte?: String;
+  skuUuid_contains?: String;
+  skuUuid_not_contains?: String;
+  skuUuid_starts_with?: String;
+  skuUuid_not_starts_with?: String;
+  skuUuid_ends_with?: String;
+  skuUuid_not_ends_with?: String;
+  localAmount?: String;
+  localAmount_not?: String;
+  localAmount_in?: String[] | String;
+  localAmount_not_in?: String[] | String;
+  localAmount_lt?: String;
+  localAmount_lte?: String;
+  localAmount_gt?: String;
+  localAmount_gte?: String;
+  localAmount_contains?: String;
+  localAmount_not_contains?: String;
+  localAmount_starts_with?: String;
+  localAmount_not_starts_with?: String;
+  localAmount_ends_with?: String;
+  localAmount_not_ends_with?: String;
+  localCurrency?: String;
+  localCurrency_not?: String;
+  localCurrency_in?: String[] | String;
+  localCurrency_not_in?: String[] | String;
+  localCurrency_lt?: String;
+  localCurrency_lte?: String;
+  localCurrency_gt?: String;
+  localCurrency_gte?: String;
+  localCurrency_contains?: String;
+  localCurrency_not_contains?: String;
+  localCurrency_starts_with?: String;
+  localCurrency_not_starts_with?: String;
+  localCurrency_ends_with?: String;
+  localCurrency_not_ends_with?: String;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  AND?: TransactionWhereInput[] | TransactionWhereInput;
+  OR?: TransactionWhereInput[] | TransactionWhereInput;
+  NOT?: TransactionWhereInput[] | TransactionWhereInput;
+}
+
 export interface NodeNode {
   id: ID_Output;
 }
 
-export interface URLConnection {
-  pageInfo: PageInfo;
-  edges: URLEdge[];
+export interface AggregateURL {
+  count: Int;
 }
 
-export interface URLConnectionPromise
-  extends Promise<URLConnection>,
+export interface AggregateURLPromise
+  extends Promise<AggregateURL>,
     Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<URLEdge>>() => T;
-  aggregate: <T = AggregateURLPromise>() => T;
+  count: () => Promise<Int>;
 }
 
-export interface URLConnectionSubscription
-  extends Promise<AsyncIterator<URLConnection>>,
+export interface AggregateURLSubscription
+  extends Promise<AsyncIterator<AggregateURL>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<URLEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateURLSubscription>() => T;
-}
-
-export interface ProductConnection {
-  pageInfo: PageInfo;
-  edges: ProductEdge[];
-}
-
-export interface ProductConnectionPromise
-  extends Promise<ProductConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<ProductEdge>>() => T;
-  aggregate: <T = AggregateProductPromise>() => T;
-}
-
-export interface ProductConnectionSubscription
-  extends Promise<AsyncIterator<ProductConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<ProductEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateProductSubscription>() => T;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface URLPreviousValues {
@@ -619,6 +1049,181 @@ export interface URLPreviousValuesSubscription
   isComplete: () => Promise<AsyncIterator<Boolean>>;
 }
 
+export interface Transaction {
+  id: ID_Output;
+  chainId: String;
+  date: String;
+  shoeSize: String;
+  productId: String;
+  skuUuid: String;
+  localAmount: String;
+  localCurrency: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface TransactionPromise extends Promise<Transaction>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  chainId: () => Promise<String>;
+  date: () => Promise<String>;
+  shoeSize: () => Promise<String>;
+  productId: () => Promise<String>;
+  skuUuid: () => Promise<String>;
+  localAmount: () => Promise<String>;
+  localCurrency: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface TransactionSubscription
+  extends Promise<AsyncIterator<Transaction>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  chainId: () => Promise<AsyncIterator<String>>;
+  date: () => Promise<AsyncIterator<String>>;
+  shoeSize: () => Promise<AsyncIterator<String>>;
+  productId: () => Promise<AsyncIterator<String>>;
+  skuUuid: () => Promise<AsyncIterator<String>>;
+  localAmount: () => Promise<AsyncIterator<String>>;
+  localCurrency: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface URLConnection {
+  pageInfo: PageInfo;
+  edges: URLEdge[];
+}
+
+export interface URLConnectionPromise
+  extends Promise<URLConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<URLEdge>>() => T;
+  aggregate: <T = AggregateURLPromise>() => T;
+}
+
+export interface URLConnectionSubscription
+  extends Promise<AsyncIterator<URLConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<URLEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateURLSubscription>() => T;
+}
+
+export interface TransactionRawPreviousValues {
+  id: ID_Output;
+  url: String;
+  uuid: String;
+  amount: Int;
+  category: String;
+  rawData: Json;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface TransactionRawPreviousValuesPromise
+  extends Promise<TransactionRawPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  url: () => Promise<String>;
+  uuid: () => Promise<String>;
+  amount: () => Promise<Int>;
+  category: () => Promise<String>;
+  rawData: () => Promise<Json>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface TransactionRawPreviousValuesSubscription
+  extends Promise<AsyncIterator<TransactionRawPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  url: () => Promise<AsyncIterator<String>>;
+  uuid: () => Promise<AsyncIterator<String>>;
+  amount: () => Promise<AsyncIterator<Int>>;
+  category: () => Promise<AsyncIterator<String>>;
+  rawData: () => Promise<AsyncIterator<Json>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface TransactionPreviousValues {
+  id: ID_Output;
+  chainId: String;
+  date: String;
+  shoeSize: String;
+  productId: String;
+  skuUuid: String;
+  localAmount: String;
+  localCurrency: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface TransactionPreviousValuesPromise
+  extends Promise<TransactionPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  chainId: () => Promise<String>;
+  date: () => Promise<String>;
+  shoeSize: () => Promise<String>;
+  productId: () => Promise<String>;
+  skuUuid: () => Promise<String>;
+  localAmount: () => Promise<String>;
+  localCurrency: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface TransactionPreviousValuesSubscription
+  extends Promise<AsyncIterator<TransactionPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  chainId: () => Promise<AsyncIterator<String>>;
+  date: () => Promise<AsyncIterator<String>>;
+  shoeSize: () => Promise<AsyncIterator<String>>;
+  productId: () => Promise<AsyncIterator<String>>;
+  skuUuid: () => Promise<AsyncIterator<String>>;
+  localAmount: () => Promise<AsyncIterator<String>>;
+  localCurrency: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface URLEdge {
+  node: URL;
+  cursor: String;
+}
+
+export interface URLEdgePromise extends Promise<URLEdge>, Fragmentable {
+  node: <T = URLPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface URLEdgeSubscription
+  extends Promise<AsyncIterator<URLEdge>>,
+    Fragmentable {
+  node: <T = URLSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateProduct {
+  count: Int;
+}
+
+export interface AggregateProductPromise
+  extends Promise<AggregateProduct>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateProductSubscription
+  extends Promise<AsyncIterator<AggregateProduct>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
 export interface URL {
   id: ID_Output;
   url: String;
@@ -651,21 +1256,81 @@ export interface URLSubscription
   isComplete: () => Promise<AsyncIterator<Boolean>>;
 }
 
-export interface URLEdge {
-  node: URL;
+export interface TransactionRawEdge {
+  node: TransactionRaw;
   cursor: String;
 }
 
-export interface URLEdgePromise extends Promise<URLEdge>, Fragmentable {
-  node: <T = URLPromise>() => T;
+export interface TransactionRawEdgePromise
+  extends Promise<TransactionRawEdge>,
+    Fragmentable {
+  node: <T = TransactionRawPromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface URLEdgeSubscription
-  extends Promise<AsyncIterator<URLEdge>>,
+export interface TransactionRawEdgeSubscription
+  extends Promise<AsyncIterator<TransactionRawEdge>>,
     Fragmentable {
-  node: <T = URLSubscription>() => T;
+  node: <T = TransactionRawSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface ProductEdge {
+  node: Product;
+  cursor: String;
+}
+
+export interface ProductEdgePromise extends Promise<ProductEdge>, Fragmentable {
+  node: <T = ProductPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface ProductEdgeSubscription
+  extends Promise<AsyncIterator<ProductEdge>>,
+    Fragmentable {
+  node: <T = ProductSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface BatchPayload {
+  count: Long;
+}
+
+export interface BatchPayloadPromise
+  extends Promise<BatchPayload>,
+    Fragmentable {
+  count: () => Promise<Long>;
+}
+
+export interface BatchPayloadSubscription
+  extends Promise<AsyncIterator<BatchPayload>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Long>>;
+}
+
+export interface TransactionRawSubscriptionPayload {
+  mutation: MutationType;
+  node: TransactionRaw;
+  updatedFields: String[];
+  previousValues: TransactionRawPreviousValues;
+}
+
+export interface TransactionRawSubscriptionPayloadPromise
+  extends Promise<TransactionRawSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = TransactionRawPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = TransactionRawPreviousValuesPromise>() => T;
+}
+
+export interface TransactionRawSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<TransactionRawSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = TransactionRawSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = TransactionRawPreviousValuesSubscription>() => T;
 }
 
 export interface Product {
@@ -724,62 +1389,110 @@ export interface ProductSubscription
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface ProductEdge {
-  node: Product;
-  cursor: String;
+export interface ProductConnection {
+  pageInfo: PageInfo;
+  edges: ProductEdge[];
 }
 
-export interface ProductEdgePromise extends Promise<ProductEdge>, Fragmentable {
-  node: <T = ProductPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface ProductEdgeSubscription
-  extends Promise<AsyncIterator<ProductEdge>>,
+export interface ProductConnectionPromise
+  extends Promise<ProductConnection>,
     Fragmentable {
-  node: <T = ProductSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<ProductEdge>>() => T;
+  aggregate: <T = AggregateProductPromise>() => T;
 }
 
-export interface AggregateURL {
+export interface ProductConnectionSubscription
+  extends Promise<AsyncIterator<ProductConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<ProductEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateProductSubscription>() => T;
+}
+
+export interface AggregateTransaction {
   count: Int;
 }
 
-export interface AggregateURLPromise
-  extends Promise<AggregateURL>,
+export interface AggregateTransactionPromise
+  extends Promise<AggregateTransaction>,
     Fragmentable {
   count: () => Promise<Int>;
 }
 
-export interface AggregateURLSubscription
-  extends Promise<AsyncIterator<AggregateURL>>,
+export interface AggregateTransactionSubscription
+  extends Promise<AsyncIterator<AggregateTransaction>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface ProductSubscriptionPayload {
-  mutation: MutationType;
-  node: Product;
-  updatedFields: String[];
-  previousValues: ProductPreviousValues;
+export interface TransactionConnection {
+  pageInfo: PageInfo;
+  edges: TransactionEdge[];
 }
 
-export interface ProductSubscriptionPayloadPromise
-  extends Promise<ProductSubscriptionPayload>,
+export interface TransactionConnectionPromise
+  extends Promise<TransactionConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<TransactionEdge>>() => T;
+  aggregate: <T = AggregateTransactionPromise>() => T;
+}
+
+export interface TransactionConnectionSubscription
+  extends Promise<AsyncIterator<TransactionConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<TransactionEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateTransactionSubscription>() => T;
+}
+
+export interface TransactionSubscriptionPayload {
+  mutation: MutationType;
+  node: Transaction;
+  updatedFields: String[];
+  previousValues: TransactionPreviousValues;
+}
+
+export interface TransactionSubscriptionPayloadPromise
+  extends Promise<TransactionSubscriptionPayload>,
     Fragmentable {
   mutation: () => Promise<MutationType>;
-  node: <T = ProductPromise>() => T;
+  node: <T = TransactionPromise>() => T;
   updatedFields: () => Promise<String[]>;
-  previousValues: <T = ProductPreviousValuesPromise>() => T;
+  previousValues: <T = TransactionPreviousValuesPromise>() => T;
 }
 
-export interface ProductSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<ProductSubscriptionPayload>>,
+export interface TransactionSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<TransactionSubscriptionPayload>>,
     Fragmentable {
   mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = ProductSubscription>() => T;
+  node: <T = TransactionSubscription>() => T;
   updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = ProductPreviousValuesSubscription>() => T;
+  previousValues: <T = TransactionPreviousValuesSubscription>() => T;
+}
+
+export interface PageInfo {
+  hasNextPage: Boolean;
+  hasPreviousPage: Boolean;
+  startCursor?: String;
+  endCursor?: String;
+}
+
+export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
+  hasNextPage: () => Promise<Boolean>;
+  hasPreviousPage: () => Promise<Boolean>;
+  startCursor: () => Promise<String>;
+  endCursor: () => Promise<String>;
+}
+
+export interface PageInfoSubscription
+  extends Promise<AsyncIterator<PageInfo>>,
+    Fragmentable {
+  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
+  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
+  startCursor: () => Promise<AsyncIterator<String>>;
+  endCursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface ProductPreviousValues {
@@ -840,43 +1553,101 @@ export interface ProductPreviousValuesSubscription
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface BatchPayload {
-  count: Long;
+export interface ProductSubscriptionPayload {
+  mutation: MutationType;
+  node: Product;
+  updatedFields: String[];
+  previousValues: ProductPreviousValues;
 }
 
-export interface BatchPayloadPromise
-  extends Promise<BatchPayload>,
+export interface ProductSubscriptionPayloadPromise
+  extends Promise<ProductSubscriptionPayload>,
     Fragmentable {
-  count: () => Promise<Long>;
+  mutation: () => Promise<MutationType>;
+  node: <T = ProductPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = ProductPreviousValuesPromise>() => T;
 }
 
-export interface BatchPayloadSubscription
-  extends Promise<AsyncIterator<BatchPayload>>,
+export interface ProductSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<ProductSubscriptionPayload>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Long>>;
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = ProductSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = ProductPreviousValuesSubscription>() => T;
 }
 
-export interface PageInfo {
-  hasNextPage: Boolean;
-  hasPreviousPage: Boolean;
-  startCursor?: String;
-  endCursor?: String;
+export interface AggregateTransactionRaw {
+  count: Int;
 }
 
-export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
-  hasNextPage: () => Promise<Boolean>;
-  hasPreviousPage: () => Promise<Boolean>;
-  startCursor: () => Promise<String>;
-  endCursor: () => Promise<String>;
-}
-
-export interface PageInfoSubscription
-  extends Promise<AsyncIterator<PageInfo>>,
+export interface AggregateTransactionRawPromise
+  extends Promise<AggregateTransactionRaw>,
     Fragmentable {
-  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
-  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
-  startCursor: () => Promise<AsyncIterator<String>>;
-  endCursor: () => Promise<AsyncIterator<String>>;
+  count: () => Promise<Int>;
+}
+
+export interface AggregateTransactionRawSubscription
+  extends Promise<AsyncIterator<AggregateTransactionRaw>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface TransactionEdge {
+  node: Transaction;
+  cursor: String;
+}
+
+export interface TransactionEdgePromise
+  extends Promise<TransactionEdge>,
+    Fragmentable {
+  node: <T = TransactionPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface TransactionEdgeSubscription
+  extends Promise<AsyncIterator<TransactionEdge>>,
+    Fragmentable {
+  node: <T = TransactionSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface TransactionRaw {
+  id: ID_Output;
+  url: String;
+  uuid: String;
+  amount: Int;
+  category: String;
+  rawData: Json;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface TransactionRawPromise
+  extends Promise<TransactionRaw>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  url: () => Promise<String>;
+  uuid: () => Promise<String>;
+  amount: () => Promise<Int>;
+  category: () => Promise<String>;
+  rawData: () => Promise<Json>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface TransactionRawSubscription
+  extends Promise<AsyncIterator<TransactionRaw>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  url: () => Promise<AsyncIterator<String>>;
+  uuid: () => Promise<AsyncIterator<String>>;
+  amount: () => Promise<AsyncIterator<Int>>;
+  category: () => Promise<AsyncIterator<String>>;
+  rawData: () => Promise<AsyncIterator<Json>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface URLSubscriptionPayload {
@@ -904,46 +1675,41 @@ export interface URLSubscriptionPayloadSubscription
   previousValues: <T = URLPreviousValuesSubscription>() => T;
 }
 
-export interface AggregateProduct {
-  count: Int;
+export interface TransactionRawConnection {
+  pageInfo: PageInfo;
+  edges: TransactionRawEdge[];
 }
 
-export interface AggregateProductPromise
-  extends Promise<AggregateProduct>,
+export interface TransactionRawConnectionPromise
+  extends Promise<TransactionRawConnection>,
     Fragmentable {
-  count: () => Promise<Int>;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<TransactionRawEdge>>() => T;
+  aggregate: <T = AggregateTransactionRawPromise>() => T;
 }
 
-export interface AggregateProductSubscription
-  extends Promise<AsyncIterator<AggregateProduct>>,
+export interface TransactionRawConnectionSubscription
+  extends Promise<AsyncIterator<TransactionRawConnection>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<TransactionRawEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateTransactionRawSubscription>() => T;
 }
-
-/*
-The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
-*/
-export type Int = number;
 
 export type Json = any;
-
-/*
-The `Boolean` scalar type represents `true` or `false`.
-*/
-export type Boolean = boolean;
-
-/*
-The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-*/
-export type String = string;
-
-export type Long = string;
 
 /*
 The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
 */
 export type ID_Input = string | number;
 export type ID_Output = string;
+
+export type Long = string;
+
+/*
+The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
+*/
+export type Int = number;
 
 /*
 DateTime scalar input type, allowing Date
@@ -954,6 +1720,16 @@ export type DateTimeInput = Date | string;
 DateTime scalar output type, which is always a string
 */
 export type DateTimeOutput = string;
+
+/*
+The `Boolean` scalar type represents `true` or `false`.
+*/
+export type Boolean = boolean;
+
+/*
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+*/
+export type String = string;
 
 /**
  * Model Metadata
@@ -966,6 +1742,14 @@ export const models: Model[] = [
   },
   {
     name: "URL",
+    embedded: false
+  },
+  {
+    name: "Transaction",
+    embedded: false
+  },
+  {
+    name: "TransactionRaw",
     embedded: false
   }
 ];

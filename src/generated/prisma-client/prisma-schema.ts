@@ -6,6 +6,14 @@ export const typeDefs = /* GraphQL */ `type AggregateProduct {
   count: Int!
 }
 
+type AggregateTransaction {
+  count: Int!
+}
+
+type AggregateTransactionRaw {
+  count: Int!
+}
+
 type AggregateURL {
   count: Int!
 }
@@ -27,6 +35,18 @@ type Mutation {
   upsertProduct(where: ProductWhereUniqueInput!, create: ProductCreateInput!, update: ProductUpdateInput!): Product!
   deleteProduct(where: ProductWhereUniqueInput!): Product
   deleteManyProducts(where: ProductWhereInput): BatchPayload!
+  createTransaction(data: TransactionCreateInput!): Transaction!
+  updateTransaction(data: TransactionUpdateInput!, where: TransactionWhereUniqueInput!): Transaction
+  updateManyTransactions(data: TransactionUpdateManyMutationInput!, where: TransactionWhereInput): BatchPayload!
+  upsertTransaction(where: TransactionWhereUniqueInput!, create: TransactionCreateInput!, update: TransactionUpdateInput!): Transaction!
+  deleteTransaction(where: TransactionWhereUniqueInput!): Transaction
+  deleteManyTransactions(where: TransactionWhereInput): BatchPayload!
+  createTransactionRaw(data: TransactionRawCreateInput!): TransactionRaw!
+  updateTransactionRaw(data: TransactionRawUpdateInput!, where: TransactionRawWhereUniqueInput!): TransactionRaw
+  updateManyTransactionRaws(data: TransactionRawUpdateManyMutationInput!, where: TransactionRawWhereInput): BatchPayload!
+  upsertTransactionRaw(where: TransactionRawWhereUniqueInput!, create: TransactionRawCreateInput!, update: TransactionRawUpdateInput!): TransactionRaw!
+  deleteTransactionRaw(where: TransactionRawWhereUniqueInput!): TransactionRaw
+  deleteManyTransactionRaws(where: TransactionRawWhereInput): BatchPayload!
   createURL(data: URLCreateInput!): URL!
   updateURL(data: URLUpdateInput!, where: URLWhereUniqueInput!): URL
   updateManyURLs(data: URLUpdateManyMutationInput!, where: URLWhereInput): BatchPayload!
@@ -382,6 +402,12 @@ type Query {
   product(where: ProductWhereUniqueInput!): Product
   products(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Product]!
   productsConnection(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ProductConnection!
+  transaction(where: TransactionWhereUniqueInput!): Transaction
+  transactions(where: TransactionWhereInput, orderBy: TransactionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Transaction]!
+  transactionsConnection(where: TransactionWhereInput, orderBy: TransactionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TransactionConnection!
+  transactionRaw(where: TransactionRawWhereUniqueInput!): TransactionRaw
+  transactionRaws(where: TransactionRawWhereInput, orderBy: TransactionRawOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TransactionRaw]!
+  transactionRawsConnection(where: TransactionRawWhereInput, orderBy: TransactionRawOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TransactionRawConnection!
   uRL(where: URLWhereUniqueInput!): URL
   uRLs(where: URLWhereInput, orderBy: URLOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [URL]!
   uRLsConnection(where: URLWhereInput, orderBy: URLOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): URLConnection!
@@ -390,7 +416,440 @@ type Query {
 
 type Subscription {
   product(where: ProductSubscriptionWhereInput): ProductSubscriptionPayload
+  transaction(where: TransactionSubscriptionWhereInput): TransactionSubscriptionPayload
+  transactionRaw(where: TransactionRawSubscriptionWhereInput): TransactionRawSubscriptionPayload
   uRL(where: URLSubscriptionWhereInput): URLSubscriptionPayload
+}
+
+type Transaction {
+  id: ID!
+  chainId: String!
+  date: String!
+  shoeSize: String!
+  productId: String!
+  skuUuid: String!
+  localAmount: String!
+  localCurrency: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type TransactionConnection {
+  pageInfo: PageInfo!
+  edges: [TransactionEdge]!
+  aggregate: AggregateTransaction!
+}
+
+input TransactionCreateInput {
+  chainId: String!
+  date: String!
+  shoeSize: String!
+  productId: String!
+  skuUuid: String!
+  localAmount: String!
+  localCurrency: String!
+}
+
+type TransactionEdge {
+  node: Transaction!
+  cursor: String!
+}
+
+enum TransactionOrderByInput {
+  id_ASC
+  id_DESC
+  chainId_ASC
+  chainId_DESC
+  date_ASC
+  date_DESC
+  shoeSize_ASC
+  shoeSize_DESC
+  productId_ASC
+  productId_DESC
+  skuUuid_ASC
+  skuUuid_DESC
+  localAmount_ASC
+  localAmount_DESC
+  localCurrency_ASC
+  localCurrency_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type TransactionPreviousValues {
+  id: ID!
+  chainId: String!
+  date: String!
+  shoeSize: String!
+  productId: String!
+  skuUuid: String!
+  localAmount: String!
+  localCurrency: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type TransactionRaw {
+  id: ID!
+  url: String!
+  uuid: String!
+  amount: Int!
+  category: String!
+  rawData: Json!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type TransactionRawConnection {
+  pageInfo: PageInfo!
+  edges: [TransactionRawEdge]!
+  aggregate: AggregateTransactionRaw!
+}
+
+input TransactionRawCreateInput {
+  url: String!
+  uuid: String!
+  amount: Int!
+  category: String!
+  rawData: Json!
+}
+
+type TransactionRawEdge {
+  node: TransactionRaw!
+  cursor: String!
+}
+
+enum TransactionRawOrderByInput {
+  id_ASC
+  id_DESC
+  url_ASC
+  url_DESC
+  uuid_ASC
+  uuid_DESC
+  amount_ASC
+  amount_DESC
+  category_ASC
+  category_DESC
+  rawData_ASC
+  rawData_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type TransactionRawPreviousValues {
+  id: ID!
+  url: String!
+  uuid: String!
+  amount: Int!
+  category: String!
+  rawData: Json!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type TransactionRawSubscriptionPayload {
+  mutation: MutationType!
+  node: TransactionRaw
+  updatedFields: [String!]
+  previousValues: TransactionRawPreviousValues
+}
+
+input TransactionRawSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: TransactionRawWhereInput
+  AND: [TransactionRawSubscriptionWhereInput!]
+  OR: [TransactionRawSubscriptionWhereInput!]
+  NOT: [TransactionRawSubscriptionWhereInput!]
+}
+
+input TransactionRawUpdateInput {
+  url: String
+  uuid: String
+  amount: Int
+  category: String
+  rawData: Json
+}
+
+input TransactionRawUpdateManyMutationInput {
+  url: String
+  uuid: String
+  amount: Int
+  category: String
+  rawData: Json
+}
+
+input TransactionRawWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  url: String
+  url_not: String
+  url_in: [String!]
+  url_not_in: [String!]
+  url_lt: String
+  url_lte: String
+  url_gt: String
+  url_gte: String
+  url_contains: String
+  url_not_contains: String
+  url_starts_with: String
+  url_not_starts_with: String
+  url_ends_with: String
+  url_not_ends_with: String
+  uuid: String
+  uuid_not: String
+  uuid_in: [String!]
+  uuid_not_in: [String!]
+  uuid_lt: String
+  uuid_lte: String
+  uuid_gt: String
+  uuid_gte: String
+  uuid_contains: String
+  uuid_not_contains: String
+  uuid_starts_with: String
+  uuid_not_starts_with: String
+  uuid_ends_with: String
+  uuid_not_ends_with: String
+  amount: Int
+  amount_not: Int
+  amount_in: [Int!]
+  amount_not_in: [Int!]
+  amount_lt: Int
+  amount_lte: Int
+  amount_gt: Int
+  amount_gte: Int
+  category: String
+  category_not: String
+  category_in: [String!]
+  category_not_in: [String!]
+  category_lt: String
+  category_lte: String
+  category_gt: String
+  category_gte: String
+  category_contains: String
+  category_not_contains: String
+  category_starts_with: String
+  category_not_starts_with: String
+  category_ends_with: String
+  category_not_ends_with: String
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [TransactionRawWhereInput!]
+  OR: [TransactionRawWhereInput!]
+  NOT: [TransactionRawWhereInput!]
+}
+
+input TransactionRawWhereUniqueInput {
+  id: ID
+  url: String
+}
+
+type TransactionSubscriptionPayload {
+  mutation: MutationType!
+  node: Transaction
+  updatedFields: [String!]
+  previousValues: TransactionPreviousValues
+}
+
+input TransactionSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: TransactionWhereInput
+  AND: [TransactionSubscriptionWhereInput!]
+  OR: [TransactionSubscriptionWhereInput!]
+  NOT: [TransactionSubscriptionWhereInput!]
+}
+
+input TransactionUpdateInput {
+  chainId: String
+  date: String
+  shoeSize: String
+  productId: String
+  skuUuid: String
+  localAmount: String
+  localCurrency: String
+}
+
+input TransactionUpdateManyMutationInput {
+  chainId: String
+  date: String
+  shoeSize: String
+  productId: String
+  skuUuid: String
+  localAmount: String
+  localCurrency: String
+}
+
+input TransactionWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  chainId: String
+  chainId_not: String
+  chainId_in: [String!]
+  chainId_not_in: [String!]
+  chainId_lt: String
+  chainId_lte: String
+  chainId_gt: String
+  chainId_gte: String
+  chainId_contains: String
+  chainId_not_contains: String
+  chainId_starts_with: String
+  chainId_not_starts_with: String
+  chainId_ends_with: String
+  chainId_not_ends_with: String
+  date: String
+  date_not: String
+  date_in: [String!]
+  date_not_in: [String!]
+  date_lt: String
+  date_lte: String
+  date_gt: String
+  date_gte: String
+  date_contains: String
+  date_not_contains: String
+  date_starts_with: String
+  date_not_starts_with: String
+  date_ends_with: String
+  date_not_ends_with: String
+  shoeSize: String
+  shoeSize_not: String
+  shoeSize_in: [String!]
+  shoeSize_not_in: [String!]
+  shoeSize_lt: String
+  shoeSize_lte: String
+  shoeSize_gt: String
+  shoeSize_gte: String
+  shoeSize_contains: String
+  shoeSize_not_contains: String
+  shoeSize_starts_with: String
+  shoeSize_not_starts_with: String
+  shoeSize_ends_with: String
+  shoeSize_not_ends_with: String
+  productId: String
+  productId_not: String
+  productId_in: [String!]
+  productId_not_in: [String!]
+  productId_lt: String
+  productId_lte: String
+  productId_gt: String
+  productId_gte: String
+  productId_contains: String
+  productId_not_contains: String
+  productId_starts_with: String
+  productId_not_starts_with: String
+  productId_ends_with: String
+  productId_not_ends_with: String
+  skuUuid: String
+  skuUuid_not: String
+  skuUuid_in: [String!]
+  skuUuid_not_in: [String!]
+  skuUuid_lt: String
+  skuUuid_lte: String
+  skuUuid_gt: String
+  skuUuid_gte: String
+  skuUuid_contains: String
+  skuUuid_not_contains: String
+  skuUuid_starts_with: String
+  skuUuid_not_starts_with: String
+  skuUuid_ends_with: String
+  skuUuid_not_ends_with: String
+  localAmount: String
+  localAmount_not: String
+  localAmount_in: [String!]
+  localAmount_not_in: [String!]
+  localAmount_lt: String
+  localAmount_lte: String
+  localAmount_gt: String
+  localAmount_gte: String
+  localAmount_contains: String
+  localAmount_not_contains: String
+  localAmount_starts_with: String
+  localAmount_not_starts_with: String
+  localAmount_ends_with: String
+  localAmount_not_ends_with: String
+  localCurrency: String
+  localCurrency_not: String
+  localCurrency_in: [String!]
+  localCurrency_not_in: [String!]
+  localCurrency_lt: String
+  localCurrency_lte: String
+  localCurrency_gt: String
+  localCurrency_gte: String
+  localCurrency_contains: String
+  localCurrency_not_contains: String
+  localCurrency_starts_with: String
+  localCurrency_not_starts_with: String
+  localCurrency_ends_with: String
+  localCurrency_not_ends_with: String
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [TransactionWhereInput!]
+  OR: [TransactionWhereInput!]
+  NOT: [TransactionWhereInput!]
+}
+
+input TransactionWhereUniqueInput {
+  id: ID
 }
 
 type URL {

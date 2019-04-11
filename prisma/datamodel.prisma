@@ -25,3 +25,28 @@ type URL {
   updatedAt: DateTime!
   isComplete: Boolean!
 }
+
+
+type Transaction {
+  id: ID! @unique
+  chainId: String!
+  date: String!
+  shoeSize: String!
+  productId: String!,
+  skuUuid: String!,
+  localAmount: String!,
+  localCurrency: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+} 
+
+type TransactionRaw {
+  id: ID! @unique
+  url: String! @unique
+  uuid: String!
+  amount: Int!
+  category: String!
+  rawData: Json!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
