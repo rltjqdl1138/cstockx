@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.18.0",
+    "cheerio": "^1.0.0-rc.3",
     "module": "^1.2.5",
     "modules": "^0.4.0",
     "prisma-client-lib": "^1.29.2"

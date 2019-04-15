@@ -50,3 +50,16 @@ type TransactionRaw {
   createdAt: DateTime!
   updatedAt: DateTime!
 }
+
+type footsellSubject {
+  id: ID! @unique
+  subjectID: String! @unique
+  isForSale: Boolean!
+  date: String!
+  ifUsed: String!
+  price: Int
+  title: String!
+  member: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}

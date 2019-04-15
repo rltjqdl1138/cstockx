@@ -28,12 +28,14 @@ class StockX {
     }
 
     const synkCallbackFunction = async (params:Array<{uuid:string, url:string}>, callback:Function) => {
-      for(let i=0; i<params.length; i++)
-        callback(params[i],i,params)
+      for(let i=0; i<params.length; i++){
+        setTimeout(callback(params[i],i,params),40000)
+      }
     }
 
     const collectRawTransactionsInPage = async (product:{uuid:string,url:string}) => {
       try{
+        console.log(product.uuid)
         // chrome use this url include 'v2'
         // but axios or postman can't use this url, StockX refused their connection.
         // need to remove 'v2'
@@ -46,26 +48,28 @@ class StockX {
 
         if(isExist.length > 0 && isExist[0].amount<1000) return;
 
-      await axios.get(product.url, headers)
-        .then((response)=>{
-          if(!response.data.Pagination){
-            console.log(`[Connection Error 2] Connection Refused by Stockx\n${product.url}`)
-            return;
-          }
-          // TODO: need to combine parameters to Object
-          if(isExist.length == 0)
-            this.insertTransactionRaw(product.url, product.uuid , currentCategory, response.data)
-          if(response.data.Pagination.nextPage){
-            const nextPage:{uuid:string, url:string} = {
-              uuid: product.uuid,
-              url:"https://stockx.com"+response.data.Pagination.nextPage
+        await axios.get(product.url, headers)
+          .then((response)=>{
+            if(!response.data.Pagination){
+              throw new Error(`[Connection Error 2] Connection Refused by Stockx\n${product.url}`)
             }
-            collectRawTransactionsInPage(nextPage)
-          }
+            // TODO: need to combine parameters to Object
+            if(isExist.length == 0)
+              this.insertTransactionRaw(product.url, product.uuid , currentCategory, response.data)
+            if(response.data.Pagination.nextPage){
+              const nextPage:{uuid:string, url:string} = {
+                uuid: product.uuid,
+                url:"https://stockx.com"+response.data.Pagination.nextPage
+              }
+              collectRawTransactionsInPage(nextPage)
+            }
+          })
+          .catch( (e) => {
+            throw new Error(`[Connection Error 2] ${e}\n${product.url}`)
+        
         })
-        .catch( e=> console.log(`[Connection Error 2] ${e}\n${product.url}`))
       }catch(e){
-        console.log(`[Error 3] ${e}\n${product.url}`)
+        console.log(`[Error 3]\n ${e}`)
       }
     }
 

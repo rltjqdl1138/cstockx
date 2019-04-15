@@ -2,7 +2,11 @@
   // Please don't change this file manually but run `prisma generate` to update it.
   // For more information, please read the docs: https://www.prisma.io/docs/prisma-client/
 
-export const typeDefs = /* GraphQL */ `type AggregateProduct {
+export const typeDefs = /* GraphQL */ `type AggregatefootsellSubject {
+  count: Int!
+}
+
+type AggregateProduct {
   count: Int!
 }
 
@@ -23,6 +27,235 @@ type BatchPayload {
 }
 
 scalar DateTime
+
+type footsellSubject {
+  id: ID!
+  subjectID: String!
+  isForSale: Boolean!
+  date: String!
+  ifUsed: String!
+  price: Int
+  title: String!
+  member: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type footsellSubjectConnection {
+  pageInfo: PageInfo!
+  edges: [footsellSubjectEdge]!
+  aggregate: AggregatefootsellSubject!
+}
+
+input footsellSubjectCreateInput {
+  subjectID: String!
+  isForSale: Boolean!
+  date: String!
+  ifUsed: String!
+  price: Int
+  title: String!
+  member: String
+}
+
+type footsellSubjectEdge {
+  node: footsellSubject!
+  cursor: String!
+}
+
+enum footsellSubjectOrderByInput {
+  id_ASC
+  id_DESC
+  subjectID_ASC
+  subjectID_DESC
+  isForSale_ASC
+  isForSale_DESC
+  date_ASC
+  date_DESC
+  ifUsed_ASC
+  ifUsed_DESC
+  price_ASC
+  price_DESC
+  title_ASC
+  title_DESC
+  member_ASC
+  member_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type footsellSubjectPreviousValues {
+  id: ID!
+  subjectID: String!
+  isForSale: Boolean!
+  date: String!
+  ifUsed: String!
+  price: Int
+  title: String!
+  member: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type footsellSubjectSubscriptionPayload {
+  mutation: MutationType!
+  node: footsellSubject
+  updatedFields: [String!]
+  previousValues: footsellSubjectPreviousValues
+}
+
+input footsellSubjectSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: footsellSubjectWhereInput
+  AND: [footsellSubjectSubscriptionWhereInput!]
+  OR: [footsellSubjectSubscriptionWhereInput!]
+  NOT: [footsellSubjectSubscriptionWhereInput!]
+}
+
+input footsellSubjectUpdateInput {
+  subjectID: String
+  isForSale: Boolean
+  date: String
+  ifUsed: String
+  price: Int
+  title: String
+  member: String
+}
+
+input footsellSubjectUpdateManyMutationInput {
+  subjectID: String
+  isForSale: Boolean
+  date: String
+  ifUsed: String
+  price: Int
+  title: String
+  member: String
+}
+
+input footsellSubjectWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  subjectID: String
+  subjectID_not: String
+  subjectID_in: [String!]
+  subjectID_not_in: [String!]
+  subjectID_lt: String
+  subjectID_lte: String
+  subjectID_gt: String
+  subjectID_gte: String
+  subjectID_contains: String
+  subjectID_not_contains: String
+  subjectID_starts_with: String
+  subjectID_not_starts_with: String
+  subjectID_ends_with: String
+  subjectID_not_ends_with: String
+  isForSale: Boolean
+  isForSale_not: Boolean
+  date: String
+  date_not: String
+  date_in: [String!]
+  date_not_in: [String!]
+  date_lt: String
+  date_lte: String
+  date_gt: String
+  date_gte: String
+  date_contains: String
+  date_not_contains: String
+  date_starts_with: String
+  date_not_starts_with: String
+  date_ends_with: String
+  date_not_ends_with: String
+  ifUsed: String
+  ifUsed_not: String
+  ifUsed_in: [String!]
+  ifUsed_not_in: [String!]
+  ifUsed_lt: String
+  ifUsed_lte: String
+  ifUsed_gt: String
+  ifUsed_gte: String
+  ifUsed_contains: String
+  ifUsed_not_contains: String
+  ifUsed_starts_with: String
+  ifUsed_not_starts_with: String
+  ifUsed_ends_with: String
+  ifUsed_not_ends_with: String
+  price: Int
+  price_not: Int
+  price_in: [Int!]
+  price_not_in: [Int!]
+  price_lt: Int
+  price_lte: Int
+  price_gt: Int
+  price_gte: Int
+  title: String
+  title_not: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_gt: String
+  title_gte: String
+  title_contains: String
+  title_not_contains: String
+  title_starts_with: String
+  title_not_starts_with: String
+  title_ends_with: String
+  title_not_ends_with: String
+  member: String
+  member_not: String
+  member_in: [String!]
+  member_not_in: [String!]
+  member_lt: String
+  member_lte: String
+  member_gt: String
+  member_gte: String
+  member_contains: String
+  member_not_contains: String
+  member_starts_with: String
+  member_not_starts_with: String
+  member_ends_with: String
+  member_not_ends_with: String
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [footsellSubjectWhereInput!]
+  OR: [footsellSubjectWhereInput!]
+  NOT: [footsellSubjectWhereInput!]
+}
+
+input footsellSubjectWhereUniqueInput {
+  id: ID
+  subjectID: String
+}
 
 scalar Json
 
@@ -53,6 +286,12 @@ type Mutation {
   upsertURL(where: URLWhereUniqueInput!, create: URLCreateInput!, update: URLUpdateInput!): URL!
   deleteURL(where: URLWhereUniqueInput!): URL
   deleteManyURLs(where: URLWhereInput): BatchPayload!
+  createfootsellSubject(data: footsellSubjectCreateInput!): footsellSubject!
+  updatefootsellSubject(data: footsellSubjectUpdateInput!, where: footsellSubjectWhereUniqueInput!): footsellSubject
+  updateManyfootsellSubjects(data: footsellSubjectUpdateManyMutationInput!, where: footsellSubjectWhereInput): BatchPayload!
+  upsertfootsellSubject(where: footsellSubjectWhereUniqueInput!, create: footsellSubjectCreateInput!, update: footsellSubjectUpdateInput!): footsellSubject!
+  deletefootsellSubject(where: footsellSubjectWhereUniqueInput!): footsellSubject
+  deleteManyfootsellSubjects(where: footsellSubjectWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -411,6 +650,9 @@ type Query {
   uRL(where: URLWhereUniqueInput!): URL
   uRLs(where: URLWhereInput, orderBy: URLOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [URL]!
   uRLsConnection(where: URLWhereInput, orderBy: URLOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): URLConnection!
+  footsellSubject(where: footsellSubjectWhereUniqueInput!): footsellSubject
+  footsellSubjects(where: footsellSubjectWhereInput, orderBy: footsellSubjectOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [footsellSubject]!
+  footsellSubjectsConnection(where: footsellSubjectWhereInput, orderBy: footsellSubjectOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): footsellSubjectConnection!
   node(id: ID!): Node
 }
 
@@ -419,6 +661,7 @@ type Subscription {
   transaction(where: TransactionSubscriptionWhereInput): TransactionSubscriptionPayload
   transactionRaw(where: TransactionRawSubscriptionWhereInput): TransactionRawSubscriptionPayload
   uRL(where: URLSubscriptionWhereInput): URLSubscriptionPayload
+  footsellSubject(where: footsellSubjectSubscriptionWhereInput): footsellSubjectSubscriptionPayload
 }
 
 type Transaction {
